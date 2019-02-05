@@ -61,7 +61,7 @@ default:
 	@echo "	make clean      - clean every thing. Do this after every change"
 	@echo "	                  of Makefile.cfg!"
 	@echo "	make install	- compile & install components specified in Makefile.cfg"
-	@echo "	make demoprogs	- make demo programs in demo/ and threeDKit/"
+	@echo "	make demoprogs	- make demo programs in demo/"
 	@echo ""
 	@echo "	make uninstall	- remove an existing installation from various"
 	@echo "	                  common places. (old traces often confuse the"
@@ -180,9 +180,6 @@ installmodule:
 installmodule.alt:
 	(cd kernel/svgalib_helper ; $(MAKE) -f Makefile.alt modules_install )
 
-lib3dkit-install:
-	(cd threeDKit/; $(MAKE) install)
-
 udev-rules-install:
 	@echo "Installing Udev rules..."
 	@$(INSTALL_DIR) $(rulesdir)
@@ -199,11 +196,11 @@ docs-install:
  
 install: installheaders $(INSTALLSHAREDLIB) installconfig \
 	$(INSTALLSTATICLIB) $(INSTALLUTILS) $(INSTALLMAN) $(INSTALLMODULE) \
-	lib3dkit-install udev-rules-install docs-install
+	docs-install
 	@echo
 	@echo
 	@echo Now run "'make demoprogs'" to make the test and demo programs in
-	@echo demos/ and threedkit/.
+	@echo demos/.
 
 uninstall:
 	@echo "Removing textmode utilities..."
@@ -243,7 +240,7 @@ STATICDIRS = staticlib/mouse staticlib/keyboard staticlib/ramdac \
 		staticlib/clockchip staticlib/joystick \
 		staticlib/drivers
 UTILDIRS = utils
-DEMODIRS = demos threeDKit
+DEMODIRS = demos
 
 $(SHAREDDIRS0) $(STATICDIRS) $(DEMODIRS):
 	mkdir -p $@
@@ -294,7 +291,6 @@ sharedlib/libvgagl.so.$(VERSION): $(SHAREDDIRS)
 
 demoprogs: $(PREDEMO) $(DEMODIRS)
 	@$(INSTALL_DIR) $(docdir)/demos/svgalib
-	@$(INSTALL_DIR) $(docdir)/demos/threeDKit
 	@for dir in $(DEMODIRS); do \
 		if [ -d $(SRCDIR)/$$dir ]; then \
 			(cd $$dir; \
@@ -334,7 +330,6 @@ distclean:
 	(cd $(SRCDIR)/gl; $(MAKE) clean)
 	(cd $(SRCDIR)/utils; $(MAKE) clean)
 	(cd $(SRCDIR)/demos; $(MAKE) clean)
-	(cd $(SRCDIR)/threeDKit; $(MAKE) clean)
 	(cd $(SRCDIR)/lrmi-0.6m; $(MAKE) clean)
 	(cd $(SRCDIR)/kernel/svgalib_helper; $(MAKE) clean)
 	rm -f *.orig
