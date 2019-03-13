@@ -290,7 +290,7 @@ sharedlib/libvgagl.so.$(VERSION): $(SHAREDDIRS)
 	)
 
 demoprogs: $(PREDEMO) $(DEMODIRS)
-	@$(INSTALL_DIR) $(docdir)/demos/svgalib
+	@$(INSTALL_DIR) $(docdir)/demos
 	@for dir in $(DEMODIRS); do \
 		if [ -d $(SRCDIR)/$$dir ]; then \
 			(cd $$dir; \
