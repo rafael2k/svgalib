@@ -44,30 +44,30 @@ $(PROGS): $(LVGADEP)
 
 .c:
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $* $*.c $(LIBS) -L$(srcdir)/sharedlib
-	$(INSTALL_PROGRAM) $* $(docdir)/demos/svgalib
+	$(INSTALL_PROGRAM) $* $(docdir)/demos
 
 rwpage: rwpage.pp
 	$(PC) -Rintel rwpage.pp
 
 testaccel: testaccel.c
 	$(CC) $(CFLAGS) $(LDFLAGS) -o testaccel testaccel.c $(LIBS) -lm -L$(srcdir)/sharedlib
-	$(INSTALL_PROGRAM) testaccel $(docdir)/demos/svgalib
+	$(INSTALL_PROGRAM) testaccel $(docdir)/demos
 
 accel: accel.c
 	$(CC) $(CFLAGS) $(LDFLAGS) -o accel accel.c $(LIBS) -lm -L$(srcdir)/sharedlib
-	$(INSTALL_PROGRAM) accel $(docdir)/demos/svgalib
+	$(INSTALL_PROGRAM) accel $(docdir)/demos
 
 linearspeed: linearspeed.c memset.o
 	$(CC) $(CFLAGS) $(LDFLAGS) -o linearspeed linearspeed.c memset.o $(LIBS) -L$(srcdir)/sharedlib
-	$(INSTALL_PROGRAM) linearspeed $(docdir)/demos/svgalib
+	$(INSTALL_PROGRAM) linearspeed $(docdir)/demos
 
 buildcsr: mkcur.o
 	$(CC) -o buildcsr $(LDFLAGS) mkcur.o -lvgagl -lvga -L$(srcdir)/sharedlib
-	$(INSTALL_PROGRAM) buildcsr $(docdir)/demos/svgalib
+	$(INSTALL_PROGRAM) buildcsr $(docdir)/demos
 
 graphics:
 	$(INSTALL_DATA) linuxlogo.bitmap eightbpp.xbm clut.xbm sixbpp.xbm \
-	wizard.xbm wizardmsk.xbm rwpage.pp $(docdir)/demos/svgalib
+	wizard.xbm wizardmsk.xbm rwpage.pp $(docdir)/demos
 
 clean:	cleanbin
 	rm -f .depend *.o *~ *.bak core
