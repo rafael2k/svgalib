@@ -170,7 +170,7 @@ static void task_startad(void *data) {
 static int svgalib_helper_ioctl( struct inode *inode, struct file *filp, 
                           unsigned int cmd, unsigned long arg) {
 #else
-static int svgalib_helper_ioctl(struct file *filp, 
+static long svgalib_helper_ioctl(struct file *filp,
                           unsigned int cmd, unsigned long arg) {
     struct inode *inode=filp->f_dentry->d_inode;
 #endif
