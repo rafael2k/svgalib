@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <unistd.h>		/* for usleep( long ) */
+#include <stdlib.h>
 #include <string.h>
 #include "vga.h"
 

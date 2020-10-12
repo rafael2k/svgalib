@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
 #include <strings.h>
 #include <vga.h>
 #include <vgagl.h>
