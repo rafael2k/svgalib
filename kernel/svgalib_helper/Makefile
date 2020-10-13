@@ -11,10 +11,6 @@ ifneq ($(KERNELRELEASE),)
    PWD	:= $(shell pwd)
    TARGET  := svgalib_helper
 
-      ifeq ($(PATCHLEVEL),4)
-         include $(TOPDIR)/Rules.make
-      endif
-
 else
 
    VER    ?= $(shell uname -r)
