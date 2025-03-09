@@ -28,9 +28,12 @@ MODULES	 = grlib.o driver.o line.o palette.o scale.o text.o font8x8.o \
 all:	libvgagl.a
 .PHONY: all clean dep
 
+libvgagl.so: libvgagl.so.$(VERSION)
 libvgagl.so.$(VERSION): $(MODULES)
 	$(CC) -s -shared -Wl,-soname,libvgagl.so.$(MAJOR_VER) -o libvgagl.so.$(VERSION) \
 	  $(MODULES)
+	ln -sf libvgagl.so.$(VERSION) libvgagl.so
+	ln -sf libvgagl.so.$(VERSION) libvgagl.so.$(MAJOR_VER)
 
 libvgagl.a: $(MODULES)
 	rm -f libvgagl.a
@@ -63,7 +66,7 @@ dep:
 	$(CC) $(INCLUDES) -MM $(patsubst %.o,$(srcdir)/gl/%.c,$(MODULES)) >>.depend.gl
 
 clean:
-	rm -f .depend.gl *.bak *.o *~ libvgagl.a libvgagl.so.$(VERSION)
+	rm -f .depend.gl *.bak *.o *~ libvgagl.a libvgagl.so*
 
 #
 # include a dependency file if one exists

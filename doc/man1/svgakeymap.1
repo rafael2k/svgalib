@@ -9,7 +9,7 @@ svgakeymap \- generates keymaps for svgalib
 Generates a keymap conversion file for
 .BR svgalib (7)
 from two keytable definitions. Keytables are searched for in
-.I /usr/lib/kbd/keytables
+.I /usr/share/keymaps
 and are automatically filtered through
 .BR gzip (1)
 if necessary.
@@ -22,7 +22,7 @@ The generated keymap is sent to the standard output and may be redirected
 or piped in any creative manner you wish.
 
 .SH FILES
-.I /usr/lib/kbd/keytables/*.map[.gz]
+.I /usr/share/keymaps/*/*/*.map[.gz]
 .RS
 The system keytable files used by
 .BR loadkeys "(1)."

@@ -96,9 +96,8 @@ installsharedlib: $(SHAREDLIBS) $(SVGALIBSHAREDSTUBS)
 	@mkdir -p ${sharedlibdir};
 	@for foo in $(notdir $(SHAREDLIBS)); do \
 		$(INSTALL_SHLIB) sharedlib/$$foo $(sharedlibdir)/$$foo; \
-		(cd $(sharedlibdir); \
-		 ln -sf $$foo `echo $$foo | sed 's/\.so\..*/.so/'` ; \
-		 ln -sf $$foo `echo $$foo | sed 's/\.so\..*/.so.1/'` ); \
+		cp -d sharedlib/`echo $$foo | sed 's/\.so\..*/.so/'` $(sharedlibdir); \
+		cp -d sharedlib/`echo $$foo | sed 's/\.so\..*/.so/'`.$(MAJOR_VER) $(sharedlibdir); \
 	done
 	-ldconfig
 

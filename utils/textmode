@@ -1,4 +1,12 @@
 #!/bin/sh
-restoretextmode -r /etc/vga/textregs
-restorefont -r /etc/vga/fontdata
+textregs=
+fontdata=
+for dir in /etc/vga "$HOME/.vga"
+do
+  test -r "$dir/textregs" && textregs="$dir/textregs"
+  test -r "$dir/fontdata" && fontdata="$dir/fontdata"
+done
+
+test -n "$textregs" && restoretextmode -r "$textregs"
+test -n "$fontdata" && restorefont -r "$fontdata"
 restorepalette

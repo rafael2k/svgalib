@@ -450,12 +450,16 @@ libvga.so.$(VERSION): $(ALLOBJS)
 	$(CC) -shared -Wl,-soname,libvga.so.$(MAJOR_VER) \
 	-Xlinker --retain-symbols-file -Xlinker ../src/exports \
 	-Wl,-Bsymbolic -o libvga.so.$(VERSION) $(ALLOBJS) -lm
+	ln -sf libvga.so.$(VERSION) libvga.so
+	ln -sf libvga.so.$(VERSION) libvga.so.$(MAJOR_VER)
 
 $(sharedlibdir)/libvga.so.$(VERSION): libvga.so.$(VERSION)
 	$(INSTALL_SHLIB) $< $(sharedlibdir)/$<
 	-ldconfig
 
 install: $(sharedlibdir)/libvga.so.$(VERSION)
+	cp -df sharedlib/libvga.so $(sharedlibdir)/
+	cp -df sharedlib/libvga.so.$(MAJOR_VER) $(sharedlibdir)/
 
 endif	  
 
