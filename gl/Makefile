@@ -31,7 +31,7 @@ all:	libvgagl.a
 libvgagl.so: libvgagl.so.$(VERSION)
 libvgagl.so.$(VERSION): $(MODULES)
 	$(CC) -s -shared -Wl,-soname,libvgagl.so.$(MAJOR_VER) -o libvgagl.so.$(VERSION) \
-	  $(MODULES)
+	  $(MODULES) -L$(srcdir)/sharedlib -lvga
 	ln -sf libvgagl.so.$(VERSION) libvgagl.so
 	ln -sf libvgagl.so.$(VERSION) libvgagl.so.$(MAJOR_VER)
 
