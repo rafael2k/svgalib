@@ -62,16 +62,6 @@ install-arch: build-arch
 	
 	mv -f debian/$(lib)/$(libdir)/lib*.so debian/$(dev)/$(libdir)
 	
-	cp -p lrmi-*/README debian/$(bin)/usr/share/doc/$(lib)/README.lrmi
-	
-	cp -p debian/README.examples \
-	      debian/$(dev)/usr/share/doc/$(lib)/examples/README.Debian
-	tar czf debian/$(dev)/usr/share/doc/$(lib)/examples/demos.tar.gz \
-		Makefile.cfg demos doc/man6/!(mach32info|plane|wrapdemo).6 \
-		src/libvga.h
-	tar czf debian/$(dev)/usr/share/doc/$(lib)/examples/threeDKit.tar.gz \
-		Makefile.cfg doc/man3/gl_*tri*.3 doc/man6/{plane,wrapdemo}.6 \
-		doc/man7/threedkit.7 threeDKit/!(0-COPYING)
 
 .PHONY: install-arch clean
 
