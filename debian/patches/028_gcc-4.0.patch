@@ -1,0 +1,37 @@
+Author: Andreas Jochens <aj@andaco.de>
+
+Index: b/src/apm.c
+===================================================================
+--- a/src/apm.c
++++ b/src/apm.c
+@@ -151,12 +151,12 @@ static int apm_saveregs(unsigned char re
+    regs[APMREG_SAVE(15)] = (k >> 8)&0xff;
+    regs[APMREG_SAVE(16)] = (k >> 16) & 0xff ;
+    regs[APMREG_SAVE(17)] = ( k >> 24 ) & 0xff ;
+-   (unsigned long)regs[APMREG_SAVE(18)] = inlXR(0xf0) ;
+-   (unsigned long)regs[APMREG_SAVE(22)] = inlXR(0xf4) ;
+-   (unsigned long)regs[APMREG_SAVE(26)] = inlXR(0x140) ;
+-   (unsigned short)regs[APMREG_SAVE(30)] = inlXR(0x144) ;
+-   (unsigned long)regs[APMREG_SAVE(32)] = inXR(0x148) ;
+-   (unsigned short)regs[APMREG_SAVE(36)] = inXR(0x14c) ;
++   regs[APMREG_SAVE(18)] = inlXR(0xf0) ;
++   regs[APMREG_SAVE(22)] = inlXR(0xf4) ;
++   regs[APMREG_SAVE(26)] = inlXR(0x140) ;
++   regs[APMREG_SAVE(30)] = inlXR(0x144) ;
++   regs[APMREG_SAVE(32)] = inXR(0x148) ;
++   regs[APMREG_SAVE(36)] = inXR(0x14c) ;
+ 
+     return APM_TOTAL_REGS - VGA_TOTAL_REGS;
+ }
+Index: b/src/vgabg.h
+===================================================================
+--- a/src/vgabg.h
++++ b/src/vgabg.h
+@@ -27,7 +27,6 @@ struct vga_bg_info
+ 
+ /* Linear video memory things */
+ 
+-extern void *__svgalib_linearframebuffer;
+ extern void *__svgalib_physaddr;
+ extern unsigned char *__svgalib_graph_mem_linear_orginal;
+ extern unsigned char *__svgalib_graph_mem_linear_check;

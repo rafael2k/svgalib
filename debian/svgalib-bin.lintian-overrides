@@ -1,0 +1,5 @@
+# These programs do not work at all if they are not suid-root
+svgalib-bin: setuid-binary usr/bin/dumpreg 4755 root/root
+svgalib-bin: setuid-binary usr/bin/restorefont 4755 root/root
+svgalib-bin: setuid-binary usr/bin/restorepalette 4755 root/root
+svgalib-bin: setuid-binary usr/bin/restoretextmode 4755 root/root

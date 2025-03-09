@@ -1,0 +1,15 @@
+Author: Peter P. Eiserloh <peter@eiserloh.org>
+
+Index: b/gl/text.c
+===================================================================
+--- a/gl/text.c
++++ b/gl/text.c
+@@ -288,7 +288,7 @@ static void expandcharacter(int bg, int 
+ 		    break;
+ 		case 3:
+ 		    *(ushort *) bitmap = bg;
+-		    *(bitmap + 2) = bg;
++		    *(bitmap + 2) = bg >> 16;
+ 		    bitmap += 3;
+ 		    break;
+ 		case 4:

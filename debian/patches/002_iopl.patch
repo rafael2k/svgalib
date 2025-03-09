@@ -1,0 +1,112 @@
+Index: b/lrmi-0.6m/mode3.c
+===================================================================
+--- a/lrmi-0.6m/mode3.c
++++ b/lrmi-0.6m/mode3.c
+@@ -6,6 +6,9 @@ Set mode to VESA mode 3 (80x25 text mode
+ #include <string.h>
+ #include <unistd.h>
+ #include <stdlib.h>
++#if __GLIBC__ >= 2
++#include <sys/io.h>            /* libc6 iopl() */
++#endif
+ #include <sys/ioctl.h>
+ #include <sys/kd.h>
+ #include <sys/stat.h>
+Index: b/lrmi-0.6m/vbemodeinfo.c
+===================================================================
+--- a/lrmi-0.6m/vbemodeinfo.c
++++ b/lrmi-0.6m/vbemodeinfo.c
+@@ -8,6 +8,9 @@ This program is in the public domain.
+ #include <string.h>
+ #include <unistd.h>
+ #include <stdlib.h>
++#if __GLIBC__ >= 2
++#include <sys/io.h>            /* libc6 iopl() */
++#endif
+ #include <sys/ioctl.h>
+ #include <sys/kd.h>
+ #include <sys/stat.h>
+Index: b/lrmi-0.6m/vbetest.c
+===================================================================
+--- a/lrmi-0.6m/vbetest.c
++++ b/lrmi-0.6m/vbetest.c
+@@ -7,6 +7,9 @@ This program is in the public domain.
+ #include <stdio.h>
+ #include <string.h>
+ #include <unistd.h>
++#if __GLIBC__ >= 2
++#include <sys/io.h>            /* libc6 iopl() */
++#endif
+ #include <sys/ioctl.h>
+ #include <sys/kd.h>
+ #include <sys/stat.h>
+Index: b/lrmi-0.6m/vga_reset.c
+===================================================================
+--- a/lrmi-0.6m/vga_reset.c
++++ b/lrmi-0.6m/vga_reset.c
+@@ -6,6 +6,9 @@ Call real mode c0003
+ #include <string.h>
+ #include <unistd.h>
+ #include <stdlib.h>
++#if __GLIBC__ >= 2
++#include <sys/io.h>            /* libc6 iopl() */
++#endif
+ 
+ #include "lrmi.h"
+ 
+Index: b/mach/mach64.c
+===================================================================
+--- a/mach/mach64.c
++++ b/mach/mach64.c
+@@ -51,6 +51,9 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <unistd.h>
++#if __GLIBC__ >= 2
++#include <sys/io.h>            /* libc6 iopl() */
++#endif
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ #include <sys/mman.h>
+Index: b/src/ati.c
+===================================================================
+--- a/src/ati.c
++++ b/src/ati.c
+@@ -31,6 +31,9 @@
+ #include <sys/mman.h>
+ #include <fcntl.h>
+ #include <unistd.h>
++#if __GLIBC__ >= 2
++#include <sys/io.h>            /* libc6 iopl() */
++#endif
+ 
+ #include "vga.h"
+ #include "libvga.h"
+Index: b/src/chips.c
+===================================================================
+--- a/src/chips.c
++++ b/src/chips.c
+@@ -85,6 +85,9 @@
+ #include <stdio.h>
+ #include <string.h>
+ #include <unistd.h>		/* iopl() */
++#if __GLIBC__ >= 2
++#include <sys/io.h>            /* libc6 iopl() */
++#endif
+ #include <signal.h>		/* sigprocmask */
+ #include <sys/mman.h>
+ #include "vga.h"
+Index: b/src/et6000.c
+===================================================================
+--- a/src/et6000.c
++++ b/src/et6000.c
+@@ -3,6 +3,9 @@
+ #include <stdlib.h>    /*  Testing modeline update. */
+ #include <stdio.h>
+ #include <unistd.h>
++#if __GLIBC__ >= 2
++#include <sys/io.h>
++#endif
+ #include <stdarg.h>
+ #include <errno.h>
+ #include <fcntl.h>

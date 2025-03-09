@@ -1,0 +1,20 @@
+Author: Guillem Jover <guillem@debian.org>
+
+On Linux kernels >= 2.6.9 and the introduction of flexmmap has revealed
+a bug in the return value test code.
+
+Index: b/src/vga.c
+===================================================================
+--- a/src/vga.c
++++ b/src/vga.c
+@@ -2001,8 +2001,8 @@ static void initialize(void)
+     };
+     __vga_mmap();
+ 
+-    if ((long) GM < 0) {
+-	printf("svgalib: mmap error rrr\n");
++    if (GM == MAP_FAILED) {
++	printf("svgalib: mmap error: %s\n", strerror(errno));
+ 	exit(1);
+     }
+     /* disable video */

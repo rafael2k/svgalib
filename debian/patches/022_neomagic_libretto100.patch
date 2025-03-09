@@ -1,0 +1,107 @@
+Author: Guillem Jover <guillem@debian.org>
+
+Index: b/src/config/libvga.config
+===================================================================
+--- a/src/config/libvga.config
++++ b/src/config/libvga.config
+@@ -251,6 +251,16 @@ kbd_only_root_keymaps
+ HorizSync 31.5 35.5
+ VertRefresh 50 90
+ 
++# If you have a NeoMagic card on a Toshiba Libretto 100, 110 use that instead
++
++# HorizSync 31.5 70
++# VertRefresh 50 100
++# Modeline "800x480"   50  800  856  976 1024   480  483  490  504 +hsync +vsync
++# newmode  800 480 256       800 1
++# newmode  800 480 32768    1600 2
++# newmode  800 480 65536    1600 2
++# newmode  800 480 16777216 2400 3
++
+ # Monitor timings
+ #
+ # These are prefered over the default timings (if monitor and chipset
+@@ -404,3 +414,8 @@ colortext
+ 		      # (main symptom is some modes are out of sync),
+ 		      # try enabling this. If it helps, please report to
+ 		      # me (matan@svgalib.org) 
++
++# NeoMagicLibretto100
++		      # Enable if you have a NeoMagic card on a Toshiba
++		      # Libretto 100, 110, etc
++
+Index: b/src/neo.c
+===================================================================
+--- a/src/neo.c
++++ b/src/neo.c
+@@ -10,8 +10,7 @@ Problem: The modes whose width is longer
+  --> Please do not select such modes :-)
+ 
+ Note:
+-  When use Toshiba Libretto100,110, please define "LIBRETTO100" at
+-  line 19 in src/neo.c
++  When use Toshiba Libretto100,110.
+   And add the following lines to libvga.config
+   -------------------------------------------------------------------
+    HorizSync 31.5 70
+@@ -40,7 +39,6 @@ Note:
+ 
+ #undef DEBUG
+ #undef NEO_PCI_BURST
+-#undef LIBRETTO100  /* Define if Toshiba Libretto100/110 */
+ 
+ #define TRUE (1)
+ #define FALSE (0)
+@@ -101,6 +99,7 @@ static int neo_init(int, int, int);
+ static void neo_unlock(void);
+ static void neo_lock(void);
+ 
++extern unsigned char __svgalib_neolibretto100;
+ static int neo_memory;
+ static int NeoChipset;
+ static int NeoPanelWidth, NeoPanelHeight;
+@@ -954,11 +953,10 @@ static int neo_init(int force, int par1,
+ 	break;
+     case 0x01:
+ 	NeoPanelWidth  = 800;
+-#ifdef LIBRETTO100
++	if (__svgalib_neolibretto100)
+ 	NeoPanelHeight = 480;
+-#else /* LIBRETTO100 */
++        else
+ 	NeoPanelHeight = 600;
+-#endif /* LIBRETTO100 */
+ 	break;
+     case 0x02:
+ 	NeoPanelWidth  = 1024;
+Index: b/src/vga.c
+===================================================================
+--- a/src/vga.c
++++ b/src/vga.c
+@@ -326,6 +326,7 @@ unsigned char __svgalib_secondary = 0; /
+ unsigned char __svgalib_novccontrol = 0; /* this is not the main card with VC'S (not yet supported) */
+ unsigned char __svgalib_simple = 0;
+ unsigned char __svgalib_ragedoubleclock = 0;
++unsigned char __svgalib_neolibretto100 = 0;
+ 
+ /* default palette values */
+ static const unsigned char default_red[256]
+@@ -3641,7 +3642,7 @@ static char *vga_conf_commands[] = {
+     "joystick0", "joystick1", "joystick2", "joystick3",
+     "textprog", "vesatext", "vesasave", "secondary", "bandwidth", 
+     "novccontrol", "newmode", "noprocpci", "vesatextmode", "pcistart",
+-    "ragedoubleclock", "vesacputype",
++    "ragedoubleclock", "vesacputype", "neomagiclibretto100",
+     NULL};
+ 
+ static char *conf_mousenames[] =
+@@ -4191,6 +4192,9 @@ static char *process_option(int command,
+         };
+ #endif
+         break;
++    case 67:
++        __svgalib_neolibretto100=1;
++        break;
+   }
+   leave:
+     return strtok(NULL, " ");

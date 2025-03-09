@@ -1,0 +1,2 @@
+# Save the SVGA text mode state on boot
+savetextmode=no

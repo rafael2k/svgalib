@@ -1,0 +1,55 @@
+Source: svgalib
+Section: graphics
+Priority: optional
+Maintainer: Debian QA Group <packages@qa.debian.org>
+Homepage: http://www.svgalib.org/
+Vcs-Browser: http://git.hadrons.org/?p=debian/pkgs/svgalib.git
+Vcs-Git: git://git.hadrons.org/git/debian/pkgs/svgalib.git
+Standards-Version: 3.9.3
+Build-Depends: debhelper (>= 8.1.3), libx86-dev [any-amd64 any-i386]
+
+Package: svgalib-bin
+Architecture: linux-any kfreebsd-any
+Depends: ${shlibs:Depends}, ${misc:Depends}, lsb-base
+Replaces: svgalib1-bin
+Provides: svgalib1-bin
+Description: console SVGA display utilities
+ svgalib provides graphics capabilities to programs running on the
+ system console, without going through the X Window System. It uses
+ direct access to the video hardware to provide low-level access to
+ the standard VGA and SVGA graphics modes. Only works with some
+ video hardware; use with caution.
+ .
+ This package contains the Svgalib utility programs.
+
+Package: libsvga1
+Architecture: linux-any kfreebsd-any
+Multi-Arch: same
+Section: libs
+Pre-Depends: ${misc:Pre-Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Replaces: svgalibg1
+Provides: svgalibg1
+Description: console SVGA display libraries
+ svgalib provides graphics capabilities to programs running on the
+ system console, without going through the X Window System. It uses
+ direct access to the video hardware to provide low-level access to
+ the standard VGA and SVGA graphics modes. Only works with some
+ video hardware; use with caution.
+ .
+ This package contains the shared libraries and config files.
+
+Package: libsvga1-dev
+Architecture: linux-any kfreebsd-any
+Section: libdevel
+Depends: libsvga1 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Replaces: svgalibg1-dev, libsvga1 (<< 1:1.4.3-32)
+Provides: svgalibg1-dev
+Description: console SVGA display development libraries and headers
+ svgalib provides graphics capabilities to programs running on the
+ system console, without going through the X Window System. It uses
+ direct access to the video hardware to provide low-level access to
+ the standard VGA and SVGA graphics modes. Only works with some
+ video hardware; use with caution.
+ .
+ This package contains the static libraries, header files and documentation.

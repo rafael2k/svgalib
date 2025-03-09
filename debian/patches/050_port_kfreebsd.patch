@@ -1,0 +1,323 @@
+Author: Tuco <tuco.xyz@gmail.com>
+Author: Guillem Jover <guillem@debian.org>
+
+---
+ src/keyboard/keyboard.c |   27 +++++++++++++++++++---
+ src/mouse/ms.c          |    4 +++
+ src/vga.c               |   57 +++++++++++++++++++++++++++++++++++++-----------
+ src/vgamisc.c           |   38 +++++++++++++++++++++++++-------
+ utils/gtf/scitech.h     |    4 +--
+ 5 files changed, 103 insertions(+), 27 deletions(-)
+
+--- a/src/keyboard/keyboard.c
++++ b/src/keyboard/keyboard.c
+@@ -33,7 +33,11 @@
+ /* should also be useful for svgalib programs using the keyboard. It misses */
+ /* a few KERNEL ifdefs around kernel data structures though. */
+ #include "keyboard_lnx.h"
++#if defined(__linux__)
+ #include <sys/vt.h>
++#elif defined(__FreeBSD_kernel__)
++#include <sys/consio.h>
++#endif
+ /* Needed to check uid of keymap files */
+ #include <sys/stat.h>
+ #include <unistd.h>
+@@ -385,6 +389,24 @@ void keyboard_close(void) {
+     __svgalib_kbd_fd = -1;
+ }
+ 
++static inline int vt_getactive(int fd)
++{
++    int v;
++#if defined(VT_GETSTATE)
++    struct vt_stat vts;
++    if (ioctl(fd, VT_GETSTATE, &vts) == 0)
++        v = vts.v_active;
++    else
++        v = -1;
++#elif defined(VT_GETACTIVE)
++    if (ioctl(fd, VT_GETACTIVE, &v) != 0)
++        v = -1;
++#else
++#error "need porting to this platform"
++#endif
++    return v;
++}
++
+ /* For now, we assume there's no console switching. */
+ /* (Actually, there won't be any unless we catch the console switching */
+ /* keys). */
+@@ -578,7 +600,6 @@ static int keyboard_getevents(int wait)
+ 	    /* VT switch. */
+ 	    /* *** what about F11 & F12? */
+ 	    int j, vt = 0;
+-	    struct vt_stat vts;
+ 	    for (j = 0; j < 12; j++)
+ 		if (functionkey_state & (1 << j)) {
+ 		    vt = j + 1;
+@@ -587,9 +608,7 @@ static int keyboard_getevents(int wait)
+ 		}
+ 
+ 	    /* Do not switch vt's if need not to */
+-	    ioctl(__svgalib_tty_fd, VT_GETSTATE, &vts);
+-
+-	    if(vt != vts.v_active) { 
++	    if(vt != vt_getactive(__svgalib_tty_fd)) {
+ 	        /* if switching vt's, need to clear keystates */
+ 	        keyboard_clearstate();
+ 	        /*
+--- a/src/mouse/ms.c
++++ b/src/mouse/ms.c
+@@ -117,7 +117,9 @@ static void ms_setspeed(const int old, c
+     tty.c_iflag = IGNBRK | IGNPAR;
+     tty.c_oflag = 0;
+     tty.c_lflag = 0;
++#ifdef __linux__
+     tty.c_line  = 0;
++#endif
+     tty.c_cc[VTIME] = 0;
+     tty.c_cc[VMIN]  = 1;
+ 
+@@ -527,7 +529,9 @@ static int ms_init(void)
+ 	tty.c_iflag = IGNBRK | IGNPAR;
+ 	tty.c_oflag = 0;
+ 	tty.c_lflag = 0;
++#ifdef __linux__
+ 	tty.c_line = 0;
++#endif
+ 	tty.c_cc[VTIME] = 0;
+ 	tty.c_cc[VMIN] = 1;
+ 	tty.c_cflag = cflag[m_type] | B1200;
+--- a/src/vga.c
++++ b/src/vga.c
+@@ -25,7 +25,11 @@
+ #include <sys/kd.h>
+ #include <sys/ioctl.h>
+ #include <sys/stat.h>
++#if defined(__linux__)
+ #include <sys/vt.h>
++#elif defined(__FreeBSD_kernel__)
++#include <sys/consio.h>
++#endif
+ #include <sys/wait.h>
+ #include <errno.h>
+ #include <ctype.h>
+@@ -91,6 +95,11 @@
+  * silly). */
+ #define USE_DEVTTY
+ 
++/* If the system does not support IUCLC, ignore it. */
++#ifndef IUCLC
++#define IUCLC 0
++#endif
++
+ #define SETSIG(sa, sig, fun) {\
+ 	sa.sa_handler = fun; \
+ 	sa.sa_flags = SA_RESTART; \
+@@ -781,7 +790,7 @@ static void set_graphtermio(void)
+     /* Leave keyboard alone when rawkeyboard is enabled! */
+     if (__svgalib_kbd_fd < 0) {
+ 	/* set graphics mode termio parameters */
+-	ioctl(0, TCSETSW, &graph_termio);
++	tcsetattr(0, TCSADRAIN, &graph_termio);
+     }
+ }
+ 
+@@ -791,7 +800,7 @@ static void set_texttermio(void)
+     /* Leave keyboard alone when rawkeyboard is enabled! */
+     if (__svgalib_kbd_fd < 0) {
+ 	/* restore text mode termio parameters */
+-	ioctl(0, TCSETSW, &text_termio);
++	tcsetattr(0, TCSADRAIN, &text_termio);
+     }
+ }
+ 
+@@ -802,9 +811,9 @@ static void disable_interrupt(void)
+ 
+     /* Well, one could argue that sigint is not enabled at all when in __svgalib_nosigint
+        but sometimes they *still* are enabled b4 graph_termio is set.. */
+-    ioctl(0, TCGETS, &cur_termio);
++    tcgetattr(0, &cur_termio);
+     cur_termio.c_lflag &= ~ISIG;
+-    ioctl(0, TCSETSW, &cur_termio);
++    tcsetattr(0, TCSADRAIN, &cur_termio);
+ }
+ 
+ 
+@@ -814,9 +823,9 @@ static void enable_interrupt(void)
+ 
+     if (__svgalib_nosigint) /* do not reenable, they are often reenabled by text_termio */
+ 	return; 
+-    ioctl(0, TCGETS, &cur_termio);
++    tcgetattr(0, &cur_termio);
+     cur_termio.c_lflag |= ISIG;
+-    ioctl(0, TCSETSW, &cur_termio);
++    tcsetattr(0, TCSADRAIN, &cur_termio);
+ }
+ 
+ /* The following is rather messy and inelegant. The only solution I can */
+@@ -938,10 +947,28 @@ static int check_owner(int vc)
+     return 0;
+ }
+ 
++static inline int vt_getactive(int fd)
++{
++    int v;
++#if defined(VT_GETSTATE)
++    struct vt_stat vts;
++    if (ioctl(fd, VT_GETSTATE, &vts) == 0)
++        v = vts.v_active;
++    else
++        v = -1;
++#elif defined(VT_GETACTIVE)
++    if (ioctl(fd, VT_GETACTIVE, &v) != 0)
++        v = -1;
++#else
++#error "need porting to this platform"
++#endif
++    return v;
++}
++
+ void __svgalib_open_devconsole(void)
+ {
+     struct vt_mode vtm;
+-    struct vt_stat vts;
++    int v_active;
+     struct stat sbuf;
+     char fname[30];
+ 
+@@ -998,8 +1025,8 @@ void __svgalib_open_devconsole(void)
+     setsid();
+     /* We must use RDWR to allow for output... */
+     if (((__svgalib_tty_fd = open(fname, O_RDWR)) >= 0) &&
+-        (ioctl(__svgalib_tty_fd, VT_GETSTATE, &vts) >= 0)) {
+-        if (!check_owner(vts.v_active))
++        (v_active = vt_getactive(__svgalib_tty_fd)) >= 0) {
++        if (!check_owner(v_active))
+             goto error;
+         /* success, redirect all stdios */
+         if (DREP)
+@@ -1016,8 +1043,8 @@ void __svgalib_open_devconsole(void)
+         /* clear screen and switch to it */
+         fwrite("\e[H\e[J", 6, 1, stderr);
+         fflush(stderr);
+-        if (svgalib_vc != vts.v_active) {
+-            startup_vc = vts.v_active;
++        if (svgalib_vc != v_active) {
++            startup_vc = v_active;
+ 	    ioctl(__svgalib_tty_fd, VT_ACTIVATE, svgalib_vc);
+             __svgalib_waitvtactive();
+ 	}
+@@ -1329,7 +1356,11 @@ static char sig2catch[] =
+  SIGTRAP, SIGIOT, SIGBUS, SIGFPE,
+  SIGSEGV, SIGPIPE, SIGALRM, SIGTERM,
+  SIGXCPU, SIGXFSZ, SIGVTALRM,
+-/* SIGPROF ,*/ SIGPWR};
++/* SIGPROF ,*/
++#ifdef SIGPWR
++SIGPWR
++#endif
++};
+ static struct sigaction old_signal_handler[sizeof(sig2catch)];
+ 
+ struct vt_mode __svgalib_oldvtmode;
+@@ -1939,7 +1970,7 @@ static void initialize(void)
+ #endif
+ 
+     /* save text mode termio parameters */
+-    ioctl(0, TCGETS, &text_termio);
++    tcgetattr(0, &text_termio);
+ 
+     graph_termio = text_termio;
+ 
+--- a/src/vgamisc.c
++++ b/src/vgamisc.c
+@@ -73,18 +73,40 @@ unsigned char *
+     return __svgalib_graph_mem;
+ }
+ 
++#if defined(__linux__)
++
+ #include <sys/sysinfo.h>
+ 
++static inline int get_totalram(void)
++{
++    struct sysinfo si;
++    si.totalram = 0;
++    sysinfo(&si);
++    return si.totalram;
++}
++
++#elif defined(__FreeBSD_kernel__)
++
++#include <sys/sysctl.h>
++
++static inline int get_totalram(void)
++{
++    int totalram;
++    size_t totalram_size = sizeof(totalram);
++    if (sysctlbyname("vm.stats.vm.v_page_count", &totalram, &totalram_size, NULL, 0) == -1)
++        return -1;
++    return totalram * getpagesize() / 1024;
++}
++
++#endif
++
+ int __svgalib_physmem(void)
+ {
+ #ifdef __alpha__
+     printf("__svgalib_physmem: are you sure you wanna do this??\n");
+     return -1;
+ #else
+-    struct sysinfo si;
+-    si.totalram = 0;
+-    sysinfo(&si);
+-    return si.totalram;
++    return get_totalram();
+ #endif
+ }
+ 
+@@ -303,18 +325,18 @@ int vga_getkey(void)
+ 
+ int vga_getkey(void)
+ {
+-    struct termio zap, original;
++    struct termios zap, original;
+     int e;
+     char c;
+ 
+-    ioctl(fileno(stdin), TCGETA, &original);	/* Get termio */
++    tcgetattr(fileno(stdin), &original);	/* Get termio */
+     zap = original;
+     zap.c_cc[VMIN] = 0;		/* Modify termio  */
+     zap.c_cc[VTIME] = 0;
+     zap.c_lflag = 0;
+-    ioctl(fileno(stdin), TCSETA, &zap);		/* Set new termio */
++    tcsetattr(fileno(stdin), TCSANOW, &zap);		/* Set new termio */
+     e = read(fileno(stdin), &c, 1);	/* Read one char */
+-    ioctl(fileno(stdin), TCSETA, &original);	/* Restore termio */
++    tcsetattr(fileno(stdin), TCSANOW, &original);	/* Restore termio */
+     if (e != 1)
+ 	return 0;		/* No key pressed. */
+     return c;			/* Return key. */
+--- a/utils/gtf/scitech.h
++++ b/utils/gtf/scitech.h
+@@ -228,7 +228,7 @@
+ #endif
+ 
+ /* 32-bit FreeBSD compile environment */
+-#elif	defined(__FREEBSD__)
++#elif	defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ #ifndef	__32BIT__
+ #define __32BIT__
+ #endif
+@@ -401,7 +401,7 @@
+ #if defined(__BEOS__)
+ #include <SupportDefs.h>
+ #else
+-#ifdef __LINUX__
++#if defined(__GLIBC__) || defined(__LINUX__)
+ #include <sys/types.h>
+ #ifdef __STRICT_ANSI__
+ typedef unsigned short  ushort;

@@ -1,0 +1,31 @@
+Index: b/utils/restorefont.c
+===================================================================
+--- a/utils/restorefont.c
++++ b/utils/restorefont.c
+@@ -4,6 +4,7 @@
+ #include <errno.h>
+ #include <sys/stat.h>
+ #include <unistd.h>
++#include "../src/libvga.h"
+ 
+ /*
+  * Note: Observe that when writing the font to a file, the file to write is
+@@ -15,7 +16,7 @@ int main(int argc, char *argv[])
+ {
+     FILE *f;
+     unsigned char *font;
+-    size_t font_size = 0x2000; /* buffer size in 1.2.11 and before */
++    size_t font_size = FONT_SIZE; /* buffer size in 1.2.11 and before */
+     int can_set = 0;
+     struct stat statbuf;
+ 
+@@ -52,6 +53,9 @@ int main(int argc, char *argv[])
+ 	    can_set = 1;
+ 	    /* Query the preferred data size: */
+ 	    font_size = vga_ext_set(VGA_EXT_FONT_SIZE, 0);
++	    if (font_size < FONT_SIZE) {
++		    font_size = FONT_SIZE;
++	    }	    
+ 	}
+     }
+ 

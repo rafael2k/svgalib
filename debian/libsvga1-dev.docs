@@ -1,0 +1,6 @@
+doc/DESIGN
+doc/TODO
+doc/Driver-programming-HOWTO
+doc/README.patching
+doc/README.joystick
+debian/README.svgalib-dummy

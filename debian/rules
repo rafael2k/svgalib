@@ -1,0 +1,107 @@
+#!/usr/bin/make -f
+# This file is public domain software, originally written by Joey Hess.
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
+
+SHELL := /bin/bash -O extglob
+
+# we use this makefile so we can get at SVGAlib's internal version
+# strings directory
+include Makefile.cfg
+
+bin := svgalib-bin
+lib := libsvga$(MAJOR_VER)
+dev := $(lib)-dev
+
+libdir := usr/lib/$(DEB_HOST_MULTIARCH)
+
+# upstream makefiles are lax about failures, so set -e
+MAKE += SHELL=/bin/sh\ -e
+
+build-indep:
+
+build-arch:
+	dh_testdir
+	
+	$(MAKE) shared static
+	$(MAKE) lrmi textutils
+
+build: build-indep build-arch
+
+.PHONY: build-indep build-arch build
+
+clean:
+	dh_testdir
+	dh_testroot
+	
+	$(MAKE) clean
+	
+	dh_clean
+
+install-arch: build-arch
+	dh_testdir
+	dh_testroot
+	dh_prep
+	dh_installdirs
+	
+	mkdir -p debian/$(dev)/$(libdir)
+	
+	$(MAKE) prefix=$(CURDIR)/debian/$(dev)/usr \
+		libdir=$(CURDIR)/debian/$(dev)/$(libdir) \
+		sharedlibdir=$(CURDIR)/debian/$(lib)/$(libdir) \
+		datadir=$(CURDIR)/debian/$(lib)/etc/vga \
+		bindir=$(CURDIR)/debian/$(bin)/usr/bin \
+		installheaders \
+		installsharedlib \
+		installstaticlib \
+		installconfig \
+		installutils
+	
+	mv -f debian/$(lib)/$(libdir)/lib*.so debian/$(dev)/$(libdir)
+	
+	cp -p lrmi-*/README debian/$(bin)/usr/share/doc/$(lib)/README.lrmi
+	
+	cp -p debian/README.examples \
+	      debian/$(dev)/usr/share/doc/$(lib)/examples/README.Debian
+	tar czf debian/$(dev)/usr/share/doc/$(lib)/examples/demos.tar.gz \
+		Makefile.cfg demos doc/man6/!(mach32info|plane|wrapdemo).6 \
+		src/libvga.h
+	tar czf debian/$(dev)/usr/share/doc/$(lib)/examples/threeDKit.tar.gz \
+		Makefile.cfg doc/man3/gl_*tri*.3 doc/man6/{plane,wrapdemo}.6 \
+		doc/man7/threedkit.7 threeDKit/!(0-COPYING)
+
+.PHONY: install-arch clean
+
+binary-indep:
+# Nothing to do.
+
+binary-arch: install-arch
+	dh_testdir
+	dh_testroot
+	dh_link -a
+	dh_installchangelogs -p$(lib) doc/CHANGES
+	dh_installdocs -a --link-doc=$(lib)
+	dh_installexamples -a
+	dh_installinit -p$(bin) --no-start -r -- start 61 S .
+	dh_installman -p$(bin) doc/man1/!(convfont|fix132x43|runx|setmclk).1 \
+			       doc/man8/*.8
+	dh_installman -p$(lib) doc/man5/*.5 doc/man7/!(threedkit).7
+	dh_installman -p$(dev) doc/man3/!(gl_*tri*).3
+	dh_lintian -a
+	dh_strip -a
+	dh_compress -a
+	dh_fixperms -a -Xbin/dumpreg -Xbin/restorefont -Xbin/restoretextmode \
+	               -Xbin/restorepalette
+	dh_makeshlibs -a
+	dh_installdeb -a
+	dh_shlibdeps -a -ldebian/$(lib)/$(libdir) -L$(lib)
+	dh_gencontrol -a
+	dh_md5sums -a
+	dh_builddeb -a
+
+binary: binary-indep binary-arch
+
+.PHONY: binary-indep binary-arch binary

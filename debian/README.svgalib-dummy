@@ -1,0 +1,28 @@
+svgalib now no longer includes svgalibg-dummy1 in the shlibs file by default.
+If your package works with either, here is a mail I received from Richard
+Braakman on the subject. Thanks to him for allowing me to include it here.
+
+Subject: Bug#18091: svgalib: libsvga1 | svgalibg-dummyg1 considered harmful
+From: dark@xs4all.nl (Richard Braakman)
+Date: Wed, 11 Feb 1998 18:32:03 +0100 (CET)
+
+I'm about to add the following lines to maelstrom's debian/rules file,
+between the dpkg-shlibdeps and dpkg-gencontrol invocations:
+
+# Maelstrom works just as well with libsvga1 as with svgalib-dummyg1.
+# (with the latter only in X mode, of course).  Check if the shlibs file
+# provided this alternative.  If not, hack it in.
+        set -e; \
+        if ! grep svgalib-dummyg1 debian/substvars >/dev/null ; then \
+                mv debian/substvars debian/substvars-unhacked ; \
+                sed -e 's/libsvga1\( *([^)]*)\)\{0,1\}/& | svgalib-dummyg1\1/' <debian/substvars-unhacked >debian/substvars; \
+        fi
+
+As far as I can tell this will work with both old and new svgalibg1
+versions.  If libsvga1 ever provides a versioned dependency in its
+shlibs file, maelstrom will use the same version number for the
+svgalib-dummyg1 alternative.
+
+Comments, please?
+
+Richard Braakman

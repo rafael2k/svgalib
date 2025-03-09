@@ -1,0 +1,787 @@
+svgalib (1:1.4.3-33) unstable; urgency=low
+
+  * QA upload.
+  * Make libsvga1-dev Replace libsvga1 << 1:1.4.3-32 due to moved doc files.
+    Thanks to Sven Joachim <svenjoac@gmx.de>. (Closes: #666550)
+
+ -- Guillem Jover <guillem@debian.org>  Thu, 12 Apr 2012 05:43:43 +0200
+
+svgalib (1:1.4.3-32) unstable; urgency=low
+
+  * Orphan package, set maintainer to Debian QA Group.
+  * Use which instead of “command -v” in svgalib-bin.init.
+  * Quote `which file` invokation so that “test -x” does not succeed on an
+    empty string, causing svgalib-bin.init to fail when the package is
+    removed but not purged. (Closes: #644264)
+  * Rename debian/libsvga1.copyright to debian/copyright, and use
+    «dh_installdocs --link-doc» instead of manual links through dh_link.
+  * Now using Standards-Version 3.9.3 (no changes needed).
+  * Remove commented out debhelper commands in debian/rules.
+  * Move doc/TODO from libsvga1 to libsvga1-dev, and do not install
+    0-README into libsvga1.
+  * Make shared library packages multiarch:
+    - Build-Depend on debhelper 8.1.3.
+    - Add misc:Pre-Depends substvar to Pre-Depends field in libsvga1.
+    - Add “Multi-Arch: same” field to libsvga1.
+    - Define DEB_HOST_MULTIARCH and use it to set libdir.
+    - Change paths from lib/ to lib/* in debian/rules.
+  * Cleanup debian/rules targets:
+    - Rename build to build-arch, add empty build-indep.
+    - Add new build target depending on build-indep and build-arch.
+    - Rename install to install-arch.
+    - Change install-arch to depend on build-arch.
+    - Change binary-arch to depend only on install-arch.
+    - Do not do anything in binary-indep.
+
+ -- Guillem Jover <guillem@debian.org>  Thu, 29 Mar 2012 07:49:12 +0200
+
+svgalib (1:1.4.3-31) unstable; urgency=low
+
+  * Fix upstream installation of setuid programs and exclude them from
+    dh_fixperms instead of restoring the permissions afterwards. This fixes
+    a build failure when the utilities are not built. (Closes: #623747)
+  * Now using Standards-Version 3.9.2 (no changes needed).
+
+ -- Guillem Jover <guillem@debian.org>  Wed, 04 May 2011 06:41:22 +0200
+
+svgalib (1:1.4.3-30) unstable; urgency=low
+
+  * Now using Standards-Version 3.9.1 (no changes needed).
+  * Use architecture wildcards:
+    - Use linux-any instead of any in binary package Architecture fields.
+    - Use any-amd64 and any-i386 in libx86-dev Build-Depends architecture
+      restrictions.
+  * Port svgalib to GNU/kFreeBSD:
+    - Use portable termios instead of termio.
+    - Use VT_GETACTIVE instead of VT_GETSTATE on kFreeBSD.
+    - Only use c_line member in struct termios on Linux.
+    - Handle systems with no SIGPWR.
+    - Implement __svgalib_physmem for kFreeBSD.
+    Thanks to Tuco <tuco.xyz@gmail.com>. (Closes: #291082, #591721)
+    - Define IUCLC to 0 if not pre-defined.
+    - Error out if there's no known way to get the current VT active state.
+    - Add kfreebsd-any to binary package Architecture fields.
+  * Add ${misc:Depends} substvars to all binary package Depends fields.
+
+ -- Guillem Jover <guillem@debian.org>  Tue, 07 Sep 2010 13:52:51 +0200
+
+svgalib (1:1.4.3-29) unstable; urgency=low
+
+  * Switch to source format “3.0 (quilt)”:
+    - Remove quilt from Build-Depends.
+    - Remove quilt.make include from debian/rules.
+    - Remove patch and unpatch targets from debian/rules.
+    - Remove now unneeded debian/README.source.
+
+ -- Guillem Jover <guillem@debian.org>  Wed, 02 Dec 2009 20:15:51 +0100
+
+svgalib (1:1.4.3-28) unstable; urgency=low
+
+  * Switch to debhelper compatibility level 7.
+  * Use dh_prep instead of “dh_clean -k”.
+  * Add support for LSB status action on init scripts.
+  * Now using Standards-Version 3.8.3 (no changes needed).
+  * Try to use the system's round function instead of locally defining it,
+    to fix a build failure with newer eglibc 2.10 which expose it by defualt.
+    - debian/patches/041_use_system_round.patch: New file.
+    (Closes: #550775)
+  * Fix LSB init dependency header:
+    - Remove $local_fs from Required-Stop as we don't do anything on stop.
+    - Switch from $local_fs to $remote_fs as we use scripts from /usr.
+  * Do not “set -e” on the init script as log_action_end_msg relies on the
+    exit code of the command, be it success or failure.
+  * Remove long obsolete svgalibg1-dev and svgalibg1 packages.
+    (Closes: #322068, #477539)
+  * Add lintian overrides for suid-root programs in svgalib-bin as those
+    cannot work at all w/o them.
+  * Fix typo in svgalib.7 man page (.RH → .RE) that was producing a warning.
+    - debian/patches/030_manpages_typos.patch: Update.
+
+ -- Guillem Jover <guillem@debian.org>  Tue, 13 Oct 2009 03:30:24 +0200
+
+svgalib (1:1.4.3-27) unstable; urgency=low
+
+  * Add a Homepage field.
+  * Add Vcs-Browser and Vcs-Git fields.
+  * Add a debian/README.source file.
+  * Now using Standards-Version 3.8.0.
+  * Refresh patches with -pab.
+  * Remove DPATCHLEVEL variable from patches.
+
+ -- Guillem Jover <guillem@debian.org>  Sun, 22 Jun 2008 10:04:23 +0300
+
+svgalib (1:1.4.3-26) unstable; urgency=low
+
+  * Fix typos in man pages. (Closes: #482003, #482004, #482005, #482006)
+    - debian/patches/030_manpages_typos.patch: Update.
+    Thanks to A. Costa <agcosta@gis.net>.
+  * Expand shell glob for install* targets in debian/rules.
+
+ -- Guillem Jover <guillem@debian.org>  Thu, 29 May 2008 05:55:06 +0300
+
+svgalib (1:1.4.3-25) unstable; urgency=low
+
+  * Remove Tag fields, those are better maintained outside the package.
+  * Use binary:Version substvar instead of deprecated Source-Version.
+  * Remove ancient Conflicts and Replaces on suidmanager, svgalib-bin,
+    svgalib, svgalib1, svgalibg1, svgalib1-dev, svgalib-dev, svgalib-dummy1
+    and svgalib-dummyg1.
+  * Now using Standards-Version 3.7.3 (no changes needed).
+  * Enable debian/patches/030_manpages_typos.patch, which got disabled during
+    the transition to quilt.
+  * Fix typo in svgalib.7 (it's -> its). (Closes: #443730)
+    Thanks to Justin Pryzby <justinpryzby@users.sourceforge.net>.
+  * Use external libx86 instead of embedded LRMI code to support VESA driver
+    on !i386 architectures (for now only amd64). (Closes: #380710)
+    - debian/patches/040_x86emu.patch: New file.
+    Based on a patch by Matthew Garrett <mjg59@srcf.ucam.org>.
+  * Port svgalib to non-i386/amd64 architectures:
+    - Disable all io based drivers for architectures other than alpha, amd64
+      and i386, and only enable fbdev on the rest.
+    - Switch package Architecture fields to any.
+    - Only suid root existing binaries for svgalib-bin.
+    - debian/patches/026_amd64.patch: Move asm fixes to ...
+    - debian/patches/029_binutils-2.16.patch: ... here.
+    - debian/patches/026_amd64.patch: Rename to ...
+    - debian/patches/026_port_non_ia32.patch: ... this. Update.
+
+ -- Guillem Jover <guillem@debian.org>  Wed, 19 Dec 2007 06:25:07 +0200
+
+svgalib (1:1.4.3-24) unstable; urgency=low
+
+  * Switched to quilt:
+    - Add new debian/patches/series file.
+    - Add Build-Depends on 'quilt (>= 0.40)'.
+    - Include quilt.make from debian/rules and remove patch and unpatch
+      targets.
+    - Remove now unused debian/patch.mk.
+  * Change default mouse device to '/dev/input/mice'. (Closes: #351799)
+    - debian/patches/031_mouse_input.patch: New file.
+  * Remove the leftover mouse saved config snippet from old versions of
+    the package. (Closes: #377063)
+  * Add a Tag: field to the binary package, using the data from debtags.
+  * Add an LSB description header to the init script.
+
+ -- Guillem Jover <guillem@debian.org>  Mon,  6 Nov 2006 04:55:15 +0200
+
+svgalib (1:1.4.3-23) unstable; urgency=low
+
+  * Remove libsvga1.postinst and libsvga1.prerm, as they were modifying
+    a conffile, and now they are empty. (Closes: #376006)
+    - As a side effect, there's no problem anymore with not using the C
+      locale when using bracket expressions. (Closes: #343597)
+  * Fix bashisms by removing svgalib-bin.preinst (which was handling an
+    upgrade path from oldstable to stable) and replace -a with && inside
+    a [] in libsvga1.postrm.
+  * Now using Standards-Version 3.7.2 (no changes needed).
+  * Switch to debhelper compatibility level 5.
+  * Update FSF's address.
+  * Make textmode look at /etc/vga when run as user, and remove old warning
+    about files directly under /etc. (Closes: #324766)
+    Thanks to Daniel Richard G. <skunk@iskunk.org> for the initial patch.
+  * Use LSB sysvinit output functions, thus svgalib-bin Depends on lsb-base.
+  * Remove unused commented lines and GZIP setting in debian/rules.
+  * Fix massive amounts of typos.
+    (Closes: #356816, #356817, #356818, #356819, #356820)
+    - debian/patches/030_manpages_typos.patch: New file.
+    Thanks to A Costa <agcosta@gis.net>.
+
+ -- Guillem Jover <guillem@debian.org>  Tue,  4 Jul 2006 09:54:02 +0300
+
+svgalib (1:1.4.3-22) unstable; urgency=low
+
+  * Update watch file to version 3 (no changes needed).
+  * Now using Standards-Version 3.6.2 (no changes needed).
+  * Fix dpatchlevel on debian/patches/028_gcc-4.0.patch.
+  * Fix build failure with binutils-2.16 due to the new assembler
+    strictness and supress some warnings. (Closes: #318560)
+    - debian/patches/029_binutils-2.16.patch: New file.
+
+ -- Guillem Jover <guillem@debian.org>  Sun, 17 Jul 2005 08:26:10 +0300
+
+svgalib (1:1.4.3-21) unstable; urgency=low
+
+  * Fix build failure with gcc-4.0. (Closes: #288573)
+    - debian/patches/028_gcc-4.0.patch: New file.
+    Thanks to Andreas Jochens <aj@andaco.de>.
+  * Rewritten the copyright file.
+
+ -- Guillem Jover <guillem@debian.org>  Tue,  1 Feb 2005 08:12:13 +0100
+
+svgalib (1:1.4.3-20) unstable; urgency=low
+
+  * debian/patches:
+    - 026_amd64.patch: Use NO_ASM on non i386 systems. (Closes: #278833)
+  * Added an init script to svgalib-bin package to optionally save SVGA
+    text mode state on boot. (Closes: #240444)
+  * Do not use a build stamp.
+  * Use patch target instead of manual constructing the call.
+
+ -- Guillem Jover <guillem@debian.org>  Wed, 29 Dec 2004 16:57:27 +0100
+
+svgalib (1:1.4.3-19) unstable; urgency=low
+
+  * debian/patches/:
+    - 026_amd64.patch: Added amd64 support. (Closes: #278833)
+      Thanks to Andreas Jochens <aj@andaco.de>.
+    - 027_mouse_none_no_print.patch: Do not print mouse initialization
+      error while not using any mouse. (Closes: #284208)
+      Thanks to Osvaldo La Rosa <info@brlspeak.net>.
+  * Added a watch file.
+
+ -- Guillem Jover <guillem@debian.org>  Mon, 20 Dec 2004 19:44:20 +0100
+
+svgalib (1:1.4.3-18) unstable; urgency=low
+
+  * debian/patches/:
+    - 024_vesa_not_print_crap.patch: Do not print leftover debugging
+      stuff. (Closes: #239666)
+      Thanks to Christian Häggström <c00chm@cs.umu.se>.
+    - 025_mmap_return_value_test.patch: Fix the test on the mmap return
+      value revealed with the new flexmmap on Linux kernels >= 2.6.9.
+  * debian/README.svgalib-dummy: Use new libsvga1 package names.
+  * Update debian/patch.mk and debian/rules accordingly.
+  * Clean debian/rules.
+  * Generate the arch independent packages in binary-indep.
+
+ -- Guillem Jover <guillem@debian.org>  Sat, 23 Oct 2004 13:37:53 +0200
+
+svgalib (1:1.4.3-17) unstable; urgency=low
+
+  * Lower-cased first letter from package description.
+  * Changed package names to libsvga from the non-standard svgalibg.
+  * debian/patches/:
+    - 004_build.patch: Provide vga_reset utility. (Closes: #228124)
+    - 021_gl_expandchar_3_bytes_pp.patch: Fix font background color assignment
+      when using 3 bytes per pixel. (Closes: #149197)
+      Thanks to Peter P. Eiserloh <peter@eiserloh.org>.
+    - 022_neomagic_libretto100.patch: Move preprocessor conditional code logic
+      for NeoMagic cards on Toshiba Libretto 100 and 110 to the config file.
+      (Closes: #76233)
+    - 023_config_add_chipsets.patc: Added missing supported chipsets to the
+      config file template.
+  * debian/vga_reset.8: Provide a manpage.
+
+ -- Guillem Jover <guillem@debian.org>  Tue, 27 Jan 2004 04:13:03 +0100
+
+svgalib (1:1.4.3-16) unstable; urgency=low
+
+  * Switch from debian/scripts to debian/patch.mk.
+  * Removed old libc5 compatibility packages.
+  * debian/patches/:
+    - 002_iopl.patch: Updated. Includes sys/io.h on modules needing it.
+    - 012_warnings.patch: Updated. Fix more warnings.
+    - 020_purge_linux_headers.patch: Include linux kernel headers in the source
+      to prevent the build failing due to broken headers provided by glibc.
+      (Closes: #223212)
+
+ -- Guillem Jover <guillem@debian.org>  Tue,  9 Dec 2003 07:12:45 +0100
+
+svgalib (1:1.4.3-15) unstable; urgency=low
+
+  * Split .diff to logical patches in debian/patches/.
+  * Created debian/scripts/ and populated with apply and unapply patch
+    scripts adapted from xfree86 Debian source package.
+  * debian/patches/:
+    - 018_vgagl_against_vga.patch: Moved and corrected -L option to link
+      libvgagl. (Closes: #211131)
+    - 019_shlib_symlinks.patch: Moved shared library symlink creation to
+      upstream Makefiles.
+  * debian/rules: Adapted to not create shared library symlinks.
+  * Now using Standards-Version 3.6.1.
+
+ -- Guillem Jover <guillem@debian.org>  Wed, 17 Sep 2003 18:33:44 +0200
+
+svgalib (1:1.4.3-14) unstable; urgency=low
+
+  * Fix libvgagl.so not explicitly linked against all needed
+    libraries (Closes: #210649).
+
+ -- Guillem Jover <guillem@debian.org>  Sat, 13 Sep 2003 18:36:53 +0200
+
+svgalib (1:1.4.3-13) unstable; urgency=low
+
+  * New Maintainer Team. (Closes: #173471).
+  * Compile lrmi.c with -fPIC. (Closes: #176070, #190338).
+  * Moved svgalibg1-dev to Section libdevel.
+  * Force dh_shlibdeps to use package svgalibg1, so svgalib-bin Depends
+    on it instead of svgalib1. Thanks Ender <ender@debian.org>.
+
+ -- Guillem Jover <guillem@debian.org>  Wed, 16 Jul 2003 15:14:52 +0200
+
+svgalib (1:1.4.3-12) unstable; urgency=low
+
+  * QA upload.
+  * src/vga.c: Remove gratuitous `##' to placate gcc 3.3.  Closes: #195591.
+
+ -- Matej Vela <vela@debian.org>  Sun,  1 Jun 2003 20:25:46 +0200
+
+svgalib (1:1.4.3-11) unstable; urgency=low
+
+  * QA upload.
+  * src/driver.h: Increase MAX_REGS to 11196 for Alliance ProMotion AT24.
+  * src/libvga.h: libc5 LinuxThreads internally used SIGUSR1/SIGUSR2, so
+    svgalib had to make do with SIGPROF/SIGUNUSED; this is not necessary
+    for libc6, which uses real-time signals.  (Well, only on 2.1.70 and
+    later kernels, but 2.0 is no longer supported by modutils anyway.)
+    Profiling should work now.  Closes: #66775.
+  * utils/svgakeymap: Default to /usr/share/keymaps/i386/qwerty/us.kmap
+    rather than /usr/share/keymaps/us.map.  Closes: #109682.
+  * debian/svgalibg1.postrm: Remove /etc/vga only if it is empty, the way
+    dpkg would.
+
+  * Move doc/Driver-programming-HOWTO from svgalibg1 to svgalibg1-dev.
+  * Move debian/README.svgalib-dummy from svgalib-bin to svgalibg1-dev.
+  * Leave out 0-INSTALL.
+  * Remove non-essential output from maintainer scripts.
+  * Makefile: Timestamp for doc/man7/svgalib.7 seems to have changed
+    accidentally; no need to regenerate 0-README.
+  * Makefile.cfg:
+    - Remove `DEB_BUILD_OPTIONS=debug' support and enable `-g' by default.
+    - Let dh_strip handle `DEB_BUILD_OPTIONS=nostrip'.
+  * debian/rules:
+    - Use dh_installman and Bash globbing extensions to replace the
+      byzantine rules.manpages.
+    - Installing directly into package build directories involves less
+      work than with debian/tmp and dh_install.
+    - Compress examples as tarballs rather than individually (saves 292K).
+    - `TARGET_FORMAT=elf', `USEGLIBC=yes' are default now.
+
+  * src/nvvga.h, src/vgaio.c, src/vgaio.h: Unused; remove.
+  * 0-RELEASE: Origin uncertain, last updated in 1999; remove.
+  * README.glibc2: `-DUSEGLIBC' no longer necessary; remove.
+  * doc/README.kernel-2.3: `BACKGROUND=y' already commented out; remove.
+  * doc/SECURITY.advisory: Fixed in 1997 (1.2.11); remove.
+  * debian/lintian/svgalib-bin: Lintian no longer issues `setuid-binary'
+    warnings for svgalib programs; remove.
+  * debian/make-symlinks: No longer necessary; remove.
+  * debian/svgalibg1.postinst: Remove 1.2.8 compatibility code from 1996.
+  * debian/svgalibg1.preinst: Remove /etc compatibility code from 1997.
+  * debian/svgalibg1.prerm: Remove /usr/doc transition code.
+  * debian/changelog: Remove obsolete Emacs local variables.
+
+  * Conforms to Standards version 3.5.8.
+
+ -- Matej Vela <vela@debian.org>  Mon,  2 Dec 2002 00:30:43 +0100
+
+svgalib (1:1.4.3-10) unstable; urgency=low
+
+  * Yet another QA upload.
+  * Fix `fails to build from source' bug introduced in -9 (closes: #148626).
+  * restorepalette.c: corrected my previous patch: run vga_setpalette, but not
+    port_in, port_out functions on framebuffer device.
+  * svgalibg1.postrm: `rm -rf /etc/vga' on purge.
+  * debian/rules: call upstream distclean in out clean target.
+
+ -- Robert Luberda <robert@debian.org>  Sat,  1 Jun 2002 10:16:55 +0200
+
+svgalib (1:1.4.3-9) unstable; urgency=low
+
+  * QA upload.
+  * Fix restorefont, restorepalette segfaults on framebuffer device
+    (probably this is fix for #128164 and #128165, but this needs more
+     testing, so I'm not closing the bugs now.)
+    + src/vga.c: check in vga_(get|put)textfont functions if font_buf1
+      was initialized. Because the variable was NULL on FBDev, memcpy()
+      caused segmentation fault error.
+    + restorefont.c: set font_size to FONT_SIZE as defined in libvga.h
+    + restorepalette.c: does nothing if chipset is FBDev.
+
+  * savetextmode and textmode now use $HOME/.vga if we don't have write
+    permission for /etc/vga directory. Documented the change in manpage
+    (closes: #61625).
+
+  * Change .so requests in manpages into symlinks. Hopefully it is only
+    thing that got broken during repackaging.
+  * svgalib-bin should conflit with suidmanager, not suidregister.
+  * svgalib-bin.preinst: remove unwanted statoverrides.
+  * Standards-Version: 3.5.6
+  * Handle DEB_BUILD_OPTIONS=debug,nostrip.
+  * Don't use -V option of dh_makeshlibs - versioned dependencies on svgalib1g
+    would probably make svgalib1-libggi2 package unusable.
+
+ -- Robert Luberda <robert@debian.org>  Sun, 26 May 2002 22:18:44 +0200
+
+svgalib (1:1.4.3-8) unstable; urgency=low
+
+  * QA upload.
+
+  * Install updated r128 driver. Quoted from upstream homepage:
+     ` The r128 driver in 1.4.3 has serious bugs that might cause system hang
+       on console switch and sync lose on some mode changes. Please use this
+       driver, r128.c, instead of the one in the distribution.'
+  * Svgalib programs can use the mouse device even when the device is only readable
+    by root since svgalib version 1.4.2 (closes: #13985, #47060).
+  * Fix typo in libvga.config (closes: #143181).
+
+  * Repackaged with debhelper v4.
+  * Don't use dpkg-statoverride or suid(un)register, just install some
+    programs suid.
+  * Package svgalib-bin: 'Conflicts: suidregister (<< 0.52)'.
+  * debian/control: use ${shlibs:Depends}, ${misc:Depends} and ${perl:Depends}
+    to get proper, versioned dependencies.
+  * Add linitan override files for setuid binaries and /usr/i486-linuxlibc1
+    directory. All packages are lintian clean now.
+
+ -- Robert Luberda <robert@debian.org>  Thu, 23 May 2002 08:26:20 +0200
+
+svgalib (1:1.4.3-7) unstable; urgency=low
+
+  * QA upload.
+  * Increase MAX_REGS to 10172 - it seems the ATI Rage Mobility VESA card
+    needs even more space (closes: #114861, #131735).
+  * Unconditionally remove /usr/doc/svgalibg1-dev symlink in prerm, not just
+    when /etc/vga/libvga.config is present (closes: #79925).
+  * Refer to the X Window System correctly (closes: #124200).
+
+ -- Colin Watson <cjwatson@debian.org>  Fri, 29 Mar 2002 04:36:58 +0000
+
+svgalib (1:1.4.3-6) unstable; urgency=low
+
+  * QA upload.
+  * Set SUPPRESS_FOR_LIBC5 while installing into the temporary tree as well
+    as when building, so that libvga doesn't get rebuilt against libc6
+    (closes: #121142).
+
+ -- Colin Watson <cjwatson@debian.org>  Mon, 11 Feb 2002 02:20:04 +0000
+
+svgalib (1:1.4.3-5) unstable; urgency=low
+
+  * Orhaning the package, I think I am not skilled enough for it.
+
+ -- Lenart Janos <ocsi@debian.org>  Sun,  3 Feb 2002 12:08:20 +0100
+
+svgalib (1:1.4.3-4) unstable; urgency=low
+
+  * Fixed the nasty dpkg-statoverride bug. (Closes: Bug#129443)
+  * No more override disparity.
+
+ -- Lenart Janos <ocsi@debian.org>  Wed, 16 Jan 2002 21:23:16 +0100
+
+svgalib (1:1.4.3-3) unstable; urgency=low
+
+  * New maintainer.
+  * Added Build-Depends: altgcc, libc5-altdev. (Closes: Bug#89819)
+  * Added Section and Priority fields.
+  * Tuned clean in debian/rules, now cleans up well.
+  * Removed some unneeded sections (strip).
+  * Now uses dpkg-statoverride.
+
+ -- Lenart Janos <ocsi@debian.org>  Tue, 15 Jan 2002 16:43:23 +0100
+
+svgalib (1:1.4.3-2) unstable; urgency=low
+
+  * Fix manpage symlinks (Closes: Bug#100115)
+  * Update default keymap location for FHS (Closes: Bug#99939)
+
+ -- Andy Mortimer <andy@debian.org>  Mon, 11 Jun 2001 19:54:01 +0100
+
+svgalib (1:1.4.3-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Andy Mortimer <andy@debian.org>  Wed, 30 May 2001 13:45:41 +0100
+
+svgalib (1:1.4.2-2) unstable; urgency=low
+
+  * Set Architecture to i386, since it no longer builds on the alpha.
+    (Closes: Bug#39312)
+
+ -- Andy Mortimer <andy@debian.org>  Mon, 12 Mar 2001 15:19:49 +0000
+
+svgalib (1:1.4.2-1) unstable; urgency=low
+
+  * New upstream version.
+  * Since /etc/vga should only contain files from svgalib, attempt to
+    remove it when purged: delete *.bak, and then attempt an rmdir.
+    (Closes: Bug#70413)
+  * Really remove the /usr/doc link on removal (Closes: Bug#65036)
+
+ -- Andy Mortimer <andy.mortimer@zetnet.co.uk>  Thu,  2 Nov 2000 15:12:38 +0000
+
+svgalib (1:1.4.1-2) unstable; urgency=low
+
+  * Fix dangling symbolic link in the man directory.
+  * Add various features from the latest pre-release on the advice of the
+    upstream maintainer:
+     - 'pnp' mouse patch
+     - banshee driver fixes
+
+ -- Andy Mortimer <andy.mortimer@zetnet.co.uk>  Thu, 13 Jan 2000 22:01:53 +0000
+
+svgalib (1:1.4.1-1) unstable; urgency=low
+
+  * New upstream version. (closes: Bug#53442)
+
+ -- Andy Mortimer <andy.mortimer@zetnet.co.uk>  Tue, 11 Jan 2000 19:42:36 +0000
+
+svgalib (1:1.4.0-3) unstable; urgency=low
+
+  * Ooops!  Fix permissions problem on install (#48262)
+
+ -- Andy Mortimer <andy.mortimer@zetnet.co.uk>  Mon, 25 Oct 1999 19:20:07 +0100
+
+svgalib (1:1.4.0-2) unstable; urgency=high
+
+  * Migrate a change from the 1.4.1 pre-release series to avoid probing
+    too much from PCI if it's not necessary (avoids funny interactions
+    with SCSI devices). (#47512)
+
+ -- Andy Mortimer <andy.mortimer@zetnet.co.uk>  Sun, 17 Oct 1999 19:07:36 +0100
+
+svgalib (1:1.4.0-1) unstable; urgency=low
+
+  * Change #if 1 to #if 0 in vgamisc.c, reenabling the old vga_getkey()
+    function which doesn't block.  Apparrently it doesn't work on the
+    alpha, but svgalib doesn't seem to compile on the alpha anyway!  If
+    anybody does have it working, patches would be appreciated ...
+    (#21821)
+  * Put Makefile.cfg and libvga.h into the examples directory, and fix
+    the pathnames in files which refer to them. (#13979)
+  * New upstream version  (#42754)
+
+ -- Andy Mortimer <andy.mortimer@zetnet.co.uk>  Thu, 26 Aug 1999 19:35:09 +0100
+
+svgalib (1:1.3.1-2) unstable; urgency=low
+
+  * Fix the symlinks for a couple of manpages (#32237)
+
+ -- Andy Mortimer <andy.mortimer@zetnet.co.uk>  Thu, 21 Jan 1999 21:17:50 +0000
+
+svgalib (1:1.3.1-1) unstable; urgency=low
+
+  * Switch off BACKGROUND mode, since it doesn't work on kernels
+    older than 2.0.36 (apparrently it crashes, although it never
+    did for me ...)
+  * Clean up some lintian errors/warnings.
+  * New upstream version.
+  * Moved data files for savetextmode from /etc to /etc/vga.
+
+ -- Andy Mortimer <andy.mortimer@zetnet.co.uk>  Tue, 12 Jan 1999 20:56:44 +0000
+
+svgalib (1:1.3.0.19981020-1) unstable; urgency=low
+
+  * Changes to debian/rules for compatibility with POSIX sh (ie,
+    remove bashisms).
+
+  * New upstrean beta release containing small bugfixes to VESA driver 
+    and Cirrus autodetection (#28359).
+
+  * This version was never released.
+
+ -- Andy Mortimer <andy.mortimer@poboxes.com>  Thu,  5 Nov 1998 20:18:52 +0000
+
+svgalib (1:1.3.0.19980916-1) unstable; urgency=medium
+
+  * Package the beta version from
+    http://www.cs.bgu.ac.il/~zivav/svgalib/, to get the updated VESA
+    driver. The upstream version number is actually 1.3.1.19980916,
+    but I've kept it at 1.3.0.19980916 to preserve the ordering of the 
+    versions in dpkg. (fixes 27420 26244 26646)
+
+ -- Andy Mortimer <andy.mortimer@poboxes.com>  Mon, 12 Oct 1998 20:49:57 +0100
+
+svgalib (1:1.3.0-0.3) stable unstable; urgency=high
+
+  * NMU: fix substvars (fixes 26177)
+  * don't exit on PCI bus 0 (maybe fixes 26241)
+
+ -- Adrian Bridgett <bridgett@debian.org>  Tue,  1 Sep 1998 20:49:57 +0100
+
+svgalib (1:1.3.0-0.2) stable unstable; urgency=high
+
+  * NMU: another loophole [fixes 25878]
+
+ -- Adrian Bridgett <bridgett@debian.org>  Tue, 18 Aug 1998 19:55:05 +0100
+
+svgalib (1:1.3.0-0.1) unstable; urgency=low
+
+  * NMU: new upstream [fixes 24461, 25484]
+  * ldconfig in all configure cases [fixes 22249]
+  * move textmode/fontdata to secure location [fixes 23739]
+  * latest security patch (file descriptor panic and dumpreg) by
+    Kevin Vajk <kvajk@ricochet.net>, Ben Gertzfield and Wichert
+    Akkermann of Debian and Pavel Kankovsky and Chris Evans of LSAP
+
+ -- Adrian Bridgett <bridgett@debian.org>  Sat, 15 Aug 1998 13:37:43 +0100
+
+svgalib (1:1.2.13-3.4) unstable frozen; urgency=HIGH
+
+  * NMU: fixes security flaw reported by Kevin Vajk <kvajk@ricochet.net>,
+    with modifications by Wichert Akkerman <wichert@debian.org>.
+
+ -- Ben Gertzfield <che@debian.org>  Thu, 23 Jul 1998 15:51:25 -0700
+
+svgalib (1:1.2.13-3.3) unstable frozen; urgency=high
+
+  * really fix savetextmode's /tmp security hole (fixes 23601)
+
+ -- Adrian Bridgett <bridgett@debian.org>  Tue, 16 Jun 1998 20:22:27 +0100
+
+svgalib (1:1.2.13-3.2) unstable frozen; urgency=high
+
+  * more conflicts for svgalib1, svgalibg1, svgalibg1-dev (fixes 20895, 20910)
+  * call ldconfig on postinst --configure - packaging-manual section 12
+
+ -- Adrian Bridgett <bridgett@debian.org>  Thu, 14 May 1998 23:01:14 +0100
+
+svgalib (1:1.2.13-3.1) unstable frozen; urgency=low
+
+  * Non-maintainer release since maintainer's machine is dead
+  * Avoid /tmp race in savetextmode (fixes 20138)
+
+ -- Adrian Bridgett <bridgett@debian.org>  Sun,  5 Apr 1998 13:39:16 +0100
+
+svgalib (1:1.2.13-3) unstable frozen; urgency=medium
+
+  * -2 didn't actually upload, but I'm making a new release anyway, since
+    some information has changed (albeit only the distribution).
+  * See the -2 changelog for more details, but this upload fixes an
+    important bug (and several smaller ones), and should therefore go into
+    frozen.
+  * Upgraded to latest standards version.
+  * Fix typos in package descriptions (should fix #18964).
+
+ -- Andy Mortimer <andy.mortimer@poboxes.com>  Mon, 16 Mar 1998 21:36:41 +0000
+
+svgalib (1:1.2.13-2) unstable; urgency=low
+
+  * Use suidmanager to set permissions on setuid binaries, if it's installed.
+  * Fix file permissions (fixes #18182, and about 300 lintian warnings).
+  * Add mouse type `unconfigured' which displays a message if a program
+    tries to access the mouse, and make it the default. (fixes #13458)
+  * Don't depend on svgalib | svgalib-dummy in shlibs (fixes #18091).
+  * New mouse type "unconfigured," now the default (fixes #13979). In order to
+    avoid annoying the Microsoft mouse owners too much, the prerm/postinst
+    contains new code to keep the mouse settings transparently across
+    upgrades (see /etc/vga/libvga.config). Those who still have the
+    default config file will have to edit it once to get the microsoft
+    mouse back, but svgalib will then track the upstream file without
+    prompting at every upgrade.
+  * Don't run ldconfig any more.
+  * All doc files now go in /usr/doc/svgalibg1, and /usr/doc/svgalib is a
+    symlink to it, rather than the other way round, to keep lintian happy.
+
+ -- Andy Mortimer <andy.mortimer@poboxes.com>  Thu, 12 Feb 1998 22:51:09 +0000
+
+svgalib (1:1.2.13-1) unstable; urgency=low
+
+  * svgalib-bin now Replaces: svgalib1-bin (fixes #15082).
+  * Increased MAX_REGS to 405 in src/driver.h (fixes #13126).
+  * New upstream release. Major features:
+    - All calls now have manpages! Interestingly enough, this doesn't seem
+      to close any bugs. As a result of this, many README files have been
+      removed.
+    - "Complete new style vga_accel support for Mach32."
+    - Extended fontbuffer in the library and in restorefont, to fix font
+      corruption problems with new kernels (fixes #12445).
+    - Added TVGA9440 support.
+  * Change /dev/console to /dev/tty0 (to which it is normally, but
+    apparrently not always, a symlink) (fixes #10584)
+  * My first personal release as maintainer.
+
+ -- Andy Mortimer <andy.mortimer@poboxes.com>  Sun, 30 Nov 1997 22:13:05 +0000
+
+svgalib (1:1.2.11-1) unstable; urgency=low
+
+  * This is a more or less non-maintainer release to finally bring out a
+    libc6 version of svgalib, which is urgently needed for the libc6
+    migration of all packages depending on it. This release has been mode
+    together by Joost Witteveen <joost@rulcmc.leidenuniv.nl> and Roman
+    Hodek <Roman.Hodek@informatik.uni-erlangen.de>. But we both don't want
+    to be maintainers for svgalib, if you want it, it's available.
+  * New upstream release (made some of Joost's libc6 changes unnecessary)
+  * removed aout stuff.
+  * changed names of packages:
+     svgalib1     ->  svgalibg1       (libc6)
+     svgalib1-dev ->  svgalibg1-dev   (libc6)
+     svgalib1-dev ->  svgalib1-altdev (libc5)
+     svgalib1-bin ->  svgalib-bin     (there's no reason to put soname in
+                                       a package that uses svgalib1g, I'd say).
+     aout-svgalib ->  -               (obvious)
+  * Changed most of the Depends/Conflicts/Replaces:
+    -the shared libs now don't conflict/replaces old versions any more
+     (different package names, should be possible to install
+     simultaniously)
+    -the -dev and -bin packages don't Replaces: svgalib any more 
+     (why was this ever done? seems strange to me).
+    -svgalib1 (libc5 shared libs) must depend on svgalibg1, because there
+     are the config files...
+  * changed the directory of the documentation to svgalib, as the docs
+    are common to all programmes, and svgalib seems the only common
+    denominator.
+  * removed $(MAKE) -f debian/rules buildclean from the "binary" target.
+    (why was this ever put there?)
+  * rewrote about every line of debian/rules for easy soname/minor name
+    changes (now uses variable $(soname), etc).
+  * allow libsvga to compile if libsvga-dev isn't installed on the
+    system (why wasn't this possible before?)
+  * removed call of ldconfig in Makefile that was executed in
+    the debian/rules binary target: I don't want my system to be
+    reconfigured when building packages.
+  * also removed uninstall dependency of install target, it can affect the
+    installation of the compiling system...
+  * Changed #ifdef USEGLIC in upstream sources to #if __GLIBC__ >= 2,
+    cause __GLIBC__ is predefined. Patch forwarded upstreams.
+  * Added $(SHLIBLIBS) when linking the shared libs; the value ("-lc") is
+    defined only from debian/rules. This adds a dependency to libc that is
+    needed by ld-linux.so.
+  * Removing of obsolete symlinks in /etc from preinst now works.
+
+ -- Roman Hodek <Roman.Hodek@informatik.uni-erlangen.de>  Thu,  7 Aug 1997 21:31:24 +0200
+
+svgalib (1:1.2.10-4) unstable; urgency=low
+
+  * Added symbolic links so that dpkg-shlibdeps works (Bug #7676)
+  * Fixed postrm scripts (Bug #7648)
+
+ -- Larry Daffner <vizzie@airmail.net>  Wed, 26 Feb 1997 23:10:58 -0600
+
+svgalib (1:1.2.10-3) unstable; urgency=low
+
+  * Moved examples to /usr/doc/svgalib1/examples
+
+ -- Larry Daffner <vizzie@airmail.net>  Tue, 11 Feb 1997 21:04:31 -0600
+
+svgalib (1:1.2.10-2) unstable; urgency=low
+
+  * Added --assert-working-epoch to preinst scripts
+  * Compiled with -D_REENTRANT
+
+ -- Larry Daffner <vizzie@airmail.net>  Sun, 26 Jan 1997 11:01:05 -0600
+
+svgalib (1:1.2.10-1) unstable; urgency=low
+
+  * Built to allow dynamic et4000 registers
+  * switched to epoch numbering scheme to mirror upstream version
+
+ -- Larry Daffner <vizzie@airmail.net>  Tue, 21 Jan 1997 23:02:16 -0600
+
+svgalib (1.210-4) unstable; urgency=low
+
+  * Fixed source package
+  * Fixed Conflicts: and Replaces: headers in svgalib1 to deal with old
+    package gracefully
+
+ -- Larry Daffner <vizzie@airmail.net>  Mon, 9 Dec 1996 01:55:07 -0600
+
+svgalib (1.210-3) unstable; urgency=low
+
+  * Added replaces: svgalib (Bug #5691, #5692)
+
+ -- Larry Daffner <vizzie@airmail.net>  Fri, 29 Nov 1996 10:11:31 -0600
+
+svgalib (1.210-2) unstable; urgency=low
+
+  * corrected error in shlibs file (Bug#5235)
+
+ -- Larry Daffner <vizzie@airmail.net>  Sun, 3 Nov 1996 19:05:33 -0600
+
+svgalib (1.210-1) unstable; urgency=low
+
+  * New upstream version
+  * Converted to new source package standards
+  * New maintainer
+  * Fixed bugs #3887, #4407, #4536, #2311
+
+ -- Larry Daffner <vizzie@airmail.net>  Thu, 31 Oct 1996 19:20:40 -0600

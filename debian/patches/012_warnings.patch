@@ -1,0 +1,365 @@
+Index: b/src/egadrv.c
+===================================================================
+--- a/src/egadrv.c
++++ b/src/egadrv.c
+@@ -10,6 +10,7 @@
+ 
+ 
+ #include <stdio.h>
++#include <stdlib.h>
+ #include <string.h>
+ #include "vga.h"
+ #include "libvga.h"
+Index: b/src/mach32.c
+===================================================================
+--- a/src/mach32.c
++++ b/src/mach32.c
+@@ -1553,8 +1553,8 @@ static int mach32_init(int force, int ch
+ 		goto writerr;
+ 	    printf("mach32: Notice: new EEPROM file >%s< succesful created.\n",
+ 		   eeprom_fname);
+-	  finish_w_eeprom:
+ 	}
++	finish_w_eeprom:
+ 	/* Change eeprom contents if requested: */
+ 	if (!(eeprom_option & EEPROM_USE_MEMCFG))
+ 	    mach32_eeprom[6] = 0;
+Index: b/src/mouse/mouse.c
+===================================================================
+--- a/src/mouse/mouse.c
++++ b/src/mouse/mouse.c
+@@ -7,6 +7,7 @@
+ #include <vga.h>
+ #include "vgamouse.h"
+ #include "../libvga.h"
++#include <stdio.h>
+ 
+ extern int mouse_open;
+ 
+Index: b/src/s3.c
+===================================================================
+--- a/src/s3.c
++++ b/src/s3.c
+@@ -474,7 +474,6 @@ static int s3_ext_set(unsigned what, va_
+ 	    dac_used->restoreState(regs);
+ 	    return old_values;
+ 	}
+-    default:
+     }
+     return 0;
+ }
+Index: b/utils/convfont.c
+===================================================================
+--- a/utils/convfont.c
++++ b/utils/convfont.c
+@@ -14,7 +14,7 @@ FILE *sf;
+ FILE *tf;
+ 
+ 
+-void
++int
+ main (int argc, char **argv)
+ {
+   int i;
+@@ -29,23 +29,23 @@ main (int argc, char **argv)
+ 	       "at least defining the first 128 characters is a good idea. The fontheight\n"
+ 	       "should be in the range 1-32.\n"
+ 	);
+-      exit (1);
++      return 1;
+     }
+   if ((sf = fopen (argv[1], "rb")) == NULL)
+     {
+       printf ("convfont: Unable to open file.\n");
+-      exit (1);
++      return 1;
+     }
+   if ((tf = fopen (argv[3], "wb")) == NULL)
+     {
+       printf ("convfont: Unable to create file.\n");
+-      exit (1);
++      return 1;
+     }
+   fontheight = atoi (argv[2]);
+   if (fontheight < 1 || fontheight > 32)
+     {
+       printf ("convfont: Invalid fontheight.\n");
+-      exit (1);
++      return 1;
+     }
+ 
+   fseek (sf, 0, SEEK_END);
+@@ -56,7 +56,7 @@ main (int argc, char **argv)
+   if (font_nuchars < 1 || font_nuchars > 256)
+     {
+       printf ("convfont: Invalid number of characters in font.\n");
+-      exit (1);
++      return 1;
+     }
+   fread (sfontbuf, 1, sfontsize, sf);
+   fclose (sf);
+@@ -77,5 +77,5 @@ main (int argc, char **argv)
+   printf ("Writing font file.\n");
+   fwrite (tfontbuf, 1, 32 * 256, tf);
+   fclose (tf);
+-  exit (0);
++  return 0;
+ }
+Index: b/utils/fix132x43.c
+===================================================================
+--- a/utils/fix132x43.c
++++ b/utils/fix132x43.c
+@@ -54,7 +54,7 @@
+ static void fixfont (int);
+ 
+ 
+-void
++int
+ main (int argc, char *argv[])
+ {
+   int vgaIOBase;
+@@ -76,19 +76,19 @@ main (int argc, char *argv[])
+ #endif
+       printf ("	-r	Switch to 8 line characters again (350 line frame, 70 Hz).\n");
+       printf ("LINES environment variable is used to detect 43 or 44 line console.\n");
+-      exit (0);
++      return 0;
+     }
+ 
+   if (argv[1][0] != '-')
+     {
+       printf ("Must specify -f, -v or -r.\n");
+-      exit (1);
++      return 1;
+     }
+ 
+   if (argv[1][1] != 'f' && argv[1][1] != 'v' && argv[1][1] != 'w' && argv[1][1] != 'r')
+     {
+       printf ("Must specify -f, -v, or -r.\n");
+-      exit (1);
++      return 1;
+     }
+ 
+   lines = atoi (getenv ("LINES"));
+@@ -197,7 +197,7 @@ main (int argc, char *argv[])
+     }
+ #endif
+ 
+-  exit (0);
++  return 0;
+ }
+ 
+ 
+Index: b/utils/gtf/gtfcalc.c
+===================================================================
+--- a/utils/gtf/gtfcalc.c
++++ b/utils/gtf/gtfcalc.c
+@@ -329,7 +329,7 @@ void GTF_setConstants(GTF_constants *con
+ 
+ #ifdef	TESTING_GTF
+ 
+-void main(int argc,char *argv[])
++int main(int argc,char *argv[])
+ {
+ 	FILE		*f;
+ 	double		xPixels,yPixels,freq;
+@@ -359,7 +359,7 @@ void main(int argc,char *argv[])
+ 		printf("\n");
+ 		printf("GTFCALC will print a summary of the results found, and dump the CRTC\n");
+ 		printf("values to the UVCONFIG.CRT file in the format used by SciTech Display Doctor.\n");
+-		exit(1);
++		return 1;
+ 		}
+ 
+ 	/* Get values from command line */
+@@ -377,7 +377,7 @@ void main(int argc,char *argv[])
+ 		GTF_calcTimings(xPixels,yPixels,freq,GTF_lockPF,false,interlace,&t);
+ 	else {
+ 		printf("Unknown command line!\n");
+-		exit(1);
++		return 1;
+ 		}
+ 
+ 	/* Dump summary info to standard output */
+@@ -435,6 +435,8 @@ void main(int argc,char *argv[])
+ 		fprintf(f, "%.2f\n", t.dotClock);
+ 		fclose(f);
+ 		}
++
++	return 0;
+ }
+ 
+ #endif	/* TESTING */
+Index: b/utils/restorefont.c
+===================================================================
+--- a/utils/restorefont.c
++++ b/utils/restorefont.c
+@@ -11,7 +11,7 @@
+  * given up). This means that there is no major security hole lurking here.
+  */
+ 
+-void main(int argc, char *argv[])
++int main(int argc, char *argv[])
+ {
+     FILE *f;
+     unsigned char *font;
+@@ -24,23 +24,23 @@ void main(int argc, char *argv[])
+ 	printf("Syntax: restorefont option filename\n");
+ 	printf("	-r filename	Restore VGA font from file.\n");
+ 	printf("	-w filename	Write current VGA font to file.\n");
+-	exit(0);
++	return 0;
+     }
+     if (argv[1][0] != '-') {
+ 	printf("Must specify -r or -w.\n");
+-	exit(1);
++	return 1;
+     }
+     switch (argv[1][1]) {
+     case 'r':
+     case 'w':
+ 	if (argc != 3) {
+ 	    printf("Must specify filename.\n");
+-	    exit(1);
++	    return 1;
+ 	}
+ 	break;
+     default:
+ 	printf("Invalid option. Must specify -r or -w.\n");
+-	exit(1);
++	return 1;
+     }
+     vga_disabledriverreport();
+     vga_setchipset(VGA);	/* avoid SVGA detection */
+@@ -71,7 +71,7 @@ void main(int argc, char *argv[])
+ 	    perror("restorefont");
+ 	  ex_no_errno:
+ 	    vga_setmode(TEXT);
+-	    exit(1);
++	    return 1;
+ 	}
+ 	if (fstat(fileno(f), &statbuf))
+ 	    goto error;
+@@ -113,5 +113,5 @@ void main(int argc, char *argv[])
+ 	break;
+     }
+     vga_setmode(TEXT);
+-    exit(0);
++    return 0;
+ }
+Index: b/utils/restorepalette.c
+===================================================================
+--- a/utils/restorepalette.c
++++ b/utils/restorepalette.c
+@@ -105,7 +105,7 @@ process_palette_file (char **argv)
+     }
+ }
+ 
+-void
++int
+ main (int argc, char *argv[])
+ {
+   int i;
+@@ -143,5 +143,5 @@ main (int argc, char *argv[])
+       port_out (0x20, ATT_IW);	/* enable display */
+       }
+     }
+-  exit (0);
++  return 0;
+ }
+Index: b/utils/restoretextmode.c
+===================================================================
+--- a/utils/restoretextmode.c
++++ b/utils/restoretextmode.c
+@@ -14,7 +14,7 @@
+ 
+ unsigned char regs[MAX_REGS];
+ 
+-void
++int
+ main (int argc, char *argv[])
+ {
+   vga_init ();
+@@ -24,12 +24,12 @@ main (int argc, char *argv[])
+       printf ("Syntax: restoretextmode option filename\n");
+       printf ("	-r filename	Restore registers from file.\n");
+       printf ("	-w filename	Write registers to file.\n");
+-      exit (0);
++      return 0;
+     }
+   if (argv[1][0] != '-')
+     {
+       printf ("Must specify -r or -w.\n");
+-      exit (1);
++      return 1;
+     }
+   switch (argv[1][1])
+     {
+@@ -38,12 +38,12 @@ main (int argc, char *argv[])
+       if (argc != 3)
+ 	{
+ 	  printf ("Must specify filename.\n");
+-	  exit (1);
++	  return 1;
+ 	}
+       break;
+     default:
+       printf ("Invalid option. Must specify -r or -w.\n");
+-      exit (1);
++      return 1;
+     }
+   if (argv[1][1] == 'r')
+     {
+@@ -53,14 +53,14 @@ main (int argc, char *argv[])
+ 	{
+ 	error:
+ 	  perror ("restoretextmode");
+-	  exit (1);
++	  return 1;
+ 	}
+       if (1 != fread (regs, MAX_REGS, 1, f))
+ 	{
+ 	  if (errno)
+ 	    goto error;
+ 	  puts ("restoretextmode: input file corrupted.");
+-	  exit (1);
++	  return 1;
+ 	}
+       fclose (f);
+     }
+@@ -86,5 +86,5 @@ main (int argc, char *argv[])
+       if (fclose (f))
+ 	goto error;
+     }
+-  exit (0);
++  return 0;
+ }
+Index: b/utils/setmclk.c
+===================================================================
+--- a/utils/setmclk.c
++++ b/utils/setmclk.c
+@@ -41,7 +41,7 @@
+ #include <vga.h>
+ #include "../src/libvga.h"	/* For port I/O macros. */
+ 
+-void
++int
+ main (void)
+ {
+   vga_init ();
+@@ -50,7 +50,7 @@ main (void)
+       printf ("Not a Cirrus.\n");
+       printf ("Continue anyway (y/n)?\n");
+       if (getchar () != 'y')
+-	exit (-1);
++	return -1;
+     }
+ 
+   /* Unlock extended registers. */
+@@ -84,5 +84,5 @@ main (void)
+   outb (0x3c5, NEW_MCLK);
+   printf ("New MCLK value: %02x\n", NEW_MCLK);
+ 
+-  exit (0);
++  return 0;
+ }

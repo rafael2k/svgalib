@@ -1,0 +1,84 @@
+Author: Guillem Jover <guillem@debian.org>
+
+Index: b/demos/mousetest.c
+===================================================================
+--- a/demos/mousetest.c
++++ b/demos/mousetest.c
+@@ -47,7 +47,7 @@ void main(void)
+     gl_enableclipping();
+ 
+ #ifdef MANUALLY_SETUP_MOUSE
+-    mouse_init("/dev/mouse", MOUSE_MICROSOFT, MOUSE_DEFAULTSAMPLERATE);
++    mouse_init("/dev/input/mice", MOUSE_MICROSOFT, MOUSE_DEFAULTSAMPLERATE);
+     mouse_setxrange(0, WIDTH - 1);
+     mouse_setyrange(0, HEIGHT - 1);
+     mouse_setwrap(MOUSE_NOWRAP);
+Index: b/doc/man5/libvga.config.5
+===================================================================
+--- a/doc/man5/libvga.config.5
++++ b/doc/man5/libvga.config.5
+@@ -80,10 +80,10 @@ To specify if you use anything else then
+ .B mdev
+ If the mouse device file is
+ .B not
+-.I /dev/mouse
+-which is generally a symbolic link to the actual mouse device
+-file. You will usually need to use this command if you want to use the
+-SpaceTec Spaceball device (which is not your usual mouse).
++.I /dev/input/mice
++which is the actual mouse device file. You will usually need to use this
++command if you want to use the SpaceTec Spaceball device (which is not
++your usual mouse).
+ 
+ .TP
+ .BR setRTS ", " clearRTS ", " leaveRTS ", " setDTR ", " clearDTR ", and " leaveDTR
+@@ -203,8 +203,8 @@ anyway.
+ .TP
+ .BI "mdev " mousedevice
+ Usually
+-.I /dev/mouse
+-(the default) will be a link to the mouse device.
++.I /dev/input/mice
++(the default) will be the mouse device.
+ However, esp. with the Spacetec Spaceball you may
+ want to specify a different device for
+ .BR svgalib (7)
+Index: b/src/config/libvga.config
+===================================================================
+--- a/src/config/libvga.config
++++ b/src/config/libvga.config
+@@ -105,7 +105,7 @@ mouse_accel_offset	30	# This is the offs
+ 				# reasonable limit, (Like a negative mult :)
+ 				# and uses the default that's in vgamouse.h
+ 
+-# Usually /dev/mouse will be a link to the mouse device.
++# The default device is /dev/input/mice.
+ # However, esp. with the Spacetec Spaceball you may
+ # want to specify a different device for svgalib to use
+ 
+Index: b/src/mouse/mouse.c
+===================================================================
+--- a/src/mouse/mouse.c
++++ b/src/mouse/mouse.c
+@@ -37,7 +37,7 @@ int mouse_init_return_fd(char *dev, int 
+ 
+     if (!mouse_open) {
+ 	    if (strcmp(dev, "") == 0)
+-		m_dev = "/dev/mouse";
++		m_dev = "/dev/input/mice";
+ 	    else
+ 		m_dev = dev;
+ 	    m_type = type & MOUSE_TYPE_MASK;
+Index: b/src/vga.c
+===================================================================
+--- a/src/vga.c
++++ b/src/vga.c
+@@ -449,7 +449,7 @@ int mouse_open = 0;
+ static int mouse_mode = 0;
+ static int mouse_type = -1;
+ static int mouse_modem_ctl = 0;
+-static char *mouse_device = "/dev/mouse";
++static char *mouse_device = "/dev/input/mice";
+ #ifndef BACKGROUND
+ static int __svgalib_oktowrite = 1;
+ #endif

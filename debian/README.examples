@@ -1,0 +1,22 @@
+The files in this directory are the examples distributed with svgalib:
+
+   demos.tar.gz         Demo and test programs.
+
+   threeDKit.tar.gz     Routines to draw 3-dimensional triangles and
+                        3D demos using these.
+
+To compile them, unpack the tarball in a temporary directory and run make:
+
+   # mkdir /tmp/svgalib
+   # cd /tmp/svgalib
+   # tar xzf /usr/share/doc/svgalibg1/examples/demos.tar.gz
+   # cd demos
+   # make
+
+To use the makefile as it stands, you will need to do this as root;
+but then, you'll need root access to run them anyway.  If you don't
+want to compile as root, remove the chown and chmod lines from the
+Makefile, and then do them manually after compilation.
+
+ -- ASM Aug 99
+ -- MV Dec 02

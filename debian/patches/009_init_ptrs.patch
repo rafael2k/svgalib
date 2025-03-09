@@ -1,0 +1,28 @@
+Index: b/src/vga.c
+===================================================================
+--- a/src/vga.c
++++ b/src/vga.c
+@@ -305,8 +305,6 @@ struct info infotable[] =
+     {0, 0, 0, 0, 0},
+     {0, 0, 0, 0, 0},
+     {0, 0, 0, 0, 0},
+-    {0, 0, 0, 0, 0},
+-    {0, 0, 0, 0, 0},
+     {0, 0, 0, 0, 0}
+ };
+ 
+@@ -507,10 +505,10 @@ unsigned char *__svgalib_sparse_mem;
+ 
+ static unsigned char *graph_buf = NULL;		/* saves graphics data during flip */
+ 
+-static unsigned char *font_buf1;	/* saved font data - plane 2 */
+-static unsigned char *font_buf2;	/* saved font data - plane 3 */
+-static unsigned char *text_buf1;	/* saved text data - plane 0 */
+-static unsigned char *text_buf2;	/* saved text data - plane 1 */
++static unsigned char *font_buf1 = NULL;	/* saved font data - plane 2 */
++static unsigned char *font_buf2 = NULL;	/* saved font data - plane 3 */
++static unsigned char *text_buf1 = NULL;	/* saved text data - plane 0 */
++static unsigned char *text_buf2 = NULL;	/* saved text data - plane 1 */
+ 
+ static struct termios text_termio;	/* text mode termio parameters     */
+ static struct termios graph_termio;	/* graphics mode termio parameters */
