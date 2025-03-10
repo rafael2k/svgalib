@@ -1,7 +1,5 @@
-CFLAGS ?= -g -Wall -m32
+CFLAGS ?= -g -Wall
 
-sources = lrmi.c
-objects = lrmi.o
 all = vbetest mode3 vga_reset vbemodeinfo dosint
 
 %.o: %.c
@@ -9,20 +7,20 @@ all = vbetest mode3 vga_reset vbemodeinfo dosint
 
 all: $(all)
 
-vbetest: vbetest.c lrmi.o
-	$(CC) $(CPPFLAGS) $(CFLAGS) -o $@ $^
+vbetest: vbetest.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) -o $@ $^ -lx86
 
-mode3: mode3.c lrmi.o
-	$(CC) $(CFLAGS) -o $@ $^
+mode3: mode3.c
+	$(CC) $(CFLAGS) -o $@ $^ -lx86
 
-dosint: dosint.c lrmi.o
-	$(CC) $(CFLAGS) -o $@ $^
+dosint: dosint.c
+	$(CC) $(CFLAGS) -o $@ $^ -lx86
 
-vbemodeinfo: vbemodeinfo.c lrmi.o
-	$(CC) $(CFLAGS) -o $@ $^
+vbemodeinfo: vbemodeinfo.c
+	$(CC) $(CFLAGS) -o $@ $^ -lx86
 
-vga_reset: vga_reset.c lrmi.o
-	$(CC) $(CFLAGS) -o $@ $^
+vga_reset: vga_reset.c
+	$(CC) $(CFLAGS) -o $@ $^ -lx86
 
 install: mode3 vga_reset
 	install mode3 /sbin

@@ -7,7 +7,7 @@
 #include <unistd.h>
 #include <sys/mman.h>		/* for mmap */
 #include <asm/vm86.h>
-#include "lrmi.h"
+#include <libx86.h>
 #include "libvga.h"
 #include "driver.h"
 

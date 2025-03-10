@@ -198,7 +198,8 @@ ifdef INCLUDE_APM_DRIVER
 endif
 ifdef INCLUDE_VESA_DRIVER
   VGA_DEFINES +=-DINCLUDE_VESA_DRIVER
-  DRIVERS += drivers/vesa.o lrmi.o
+  DRIVERS += drivers/vesa.o
+  SHLIBLIBS += -lx86
   ifdef INCLUDE_VESA_DRIVER_TEST
     VGA_DEFINES += -DINCLUDE_VESA_DRIVER_TEST
   endif

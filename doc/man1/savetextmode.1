@@ -10,11 +10,7 @@ savetextmode, textmode \- save or restore the complete SVGA status for textmode.
 .SH DESCRIPTION
 These are simple scripts to save the SVGA register state when in textmode to the
 files
-.IR /etc/vga/fontdata " and " /etc/vga/textregs
-.RI ( $HOME/.vga/fontdata " and " $HOME/.vga/textregs
-if directory
-.I /etc/vga
-is not writeable)
+.IR /tmp/fontdata " and " /tmp/textregs
 or to restore it from these files.
 
 The actual utilities used are
@@ -44,13 +40,9 @@ left in raw mode, nothing can really help you as you cannot enter anything which
 will understand.
 
 .SH FILES
-.I /etc/vga/fontdata
-or
-.I $HOME/.vga/fontdata
+.I /tmp/fontdata
 .br
-.I /etc/vga/textregs
-or
-.I $HOME/.vga/textregs
+.I /tmp/textregs
 
 .SH SEE ALSO
 
