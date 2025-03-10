@@ -33,7 +33,7 @@ static inline int RGB2BGR(int c)
 /* However bswap is not supported by 386 */
 
     if (MODEFLAGS & MODEFLAG_24BPP_REVERSED)
-#ifdef NO_ASSEMBLY
+#if 1 // ifdef NO_ASSEMBLY
 	c = ((c >> 0) & 0xff) << 16 |
 	    ((c >> 8) & 0xff) << 8 |
 	    ((c >> 16) & 0xff) << 0;

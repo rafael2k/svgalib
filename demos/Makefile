@@ -13,7 +13,7 @@ VPATH     = $(srcdir)/demos
 # Compiler Section (overrides Makefile.cfg)
 #----------------------------------------------------------------------
 
-CFLAGS = $(WARN) $(OPTIMIZE) -I$(srcdir)/include -I$(srcdir)/gl $(DEBFLAGS)
+CFLAGS = $(WARN) $(OPTIMIZE) -I$(srcdir)/include -I$(srcdir)/gl $(DEBFLAGS) -m32
 ifeq (a.out, $(TARGET_FORMAT))
   CFLAGS += -DSVGA_AOUT
 endif
@@ -28,13 +28,13 @@ PROGS    = fun testgl speedtest mousetest vgatest scrolltest testlinear \
 	   svidtune linearfork cursor vgatweak buildcsr
 
 # Determine what library (static or shared) we will be linking programs with
-ifdef INSTALLSHAREDLIB
-  LIBS = -lvgagl -lvga
-endif
-ifndef LIBS
+#ifdef INSTALLSHAREDLIB
+#  LIBS = -lvgagl -lvga
+#endif
+#ifndef LIBS
   LIBS    = ../staticlib/libvgagl.a ../staticlib/libvga.a -lm
   LVGADEP = $(LIBS)
-endif
+#endif
 
 all:	$(PROGS) graphics
 
@@ -47,7 +47,7 @@ $(PROGS): $(LVGADEP)
 	$(INSTALL_PROGRAM) $* $(docdir)/demos
 
 rwpage: rwpage.pp
-	$(PC) -Rintel rwpage.pp
+	$(PC) -m32 -Rintel rwpage.pp
 
 testaccel: testaccel.c
 	$(CC) $(CFLAGS) $(LDFLAGS) -o testaccel testaccel.c $(LIBS) -lm -L$(srcdir)/sharedlib
@@ -62,7 +62,7 @@ linearspeed: linearspeed.c memset.o
 	$(INSTALL_PROGRAM) linearspeed $(docdir)/demos
 
 buildcsr: mkcur.o
-	$(CC) -o buildcsr $(LDFLAGS) mkcur.o -lvgagl -lvga -L$(srcdir)/sharedlib
+	$(CC) -m32 -o buildcsr $(LDFLAGS) mkcur.o -lvgagl -lvga -L$(srcdir)/sharedlib
 	$(INSTALL_PROGRAM) buildcsr $(docdir)/demos
 
 graphics:

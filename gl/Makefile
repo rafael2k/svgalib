@@ -30,7 +30,7 @@ all:	libvgagl.a
 
 libvgagl.so: libvgagl.so.$(VERSION)
 libvgagl.so.$(VERSION): $(MODULES)
-	$(CC) -s -shared -Wl,-soname,libvgagl.so.$(MAJOR_VER) -o libvgagl.so.$(VERSION) \
+	$(CC) -m32 -s -shared -Wl,-soname,libvgagl.so.$(MAJOR_VER) -o libvgagl.so.$(VERSION) \
 	  $(MODULES) -L$(srcdir)/sharedlib -lvga
 	ln -sf libvgagl.so.$(VERSION) libvgagl.so
 	ln -sf libvgagl.so.$(VERSION) libvgagl.so.$(MAJOR_VER)
@@ -40,19 +40,19 @@ libvgagl.a: $(MODULES)
 	$(AR) rcs libvgagl.a $(MODULES)
 
 .c.o:
-	$(CC) $(CFLAGS) -c -o $*.o $<
+	$(CC) -m32 $(CFLAGS) -c -o $*.o $<
 
 .S.s:
-	$(CC) $(CFLAGS) -E $< >$@
+	$(CC) -m32 $(CFLAGS) -E $< >$@
 
 .s.o:
-	$(CC) $(CFLAGS) -c -o $*.o $<
+	$(CC) -m32 $(CFLAGS) -c -o $*.o $<
 
 .c.s:
-	$(CC) $(CFLAGS) -S -o $*.s $<
+	$(CC) -m32 $(CFLAGS) -S -o $*.s $<
 
 .o:
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $* $*.o $(LIBS)
+	$(CC) -m32 $(CFLAGS) $(LDFLAGS) -o $* $*.o $(LIBS)
 	chmod 4755 $*
 
 $(MODULES): .depend.gl

@@ -15,7 +15,7 @@ VPATH     = $(srcdir)/utils
 
 CFLAGS = $(WARN) $(OPTIMIZE) -I../include -L../sharedlib
 #Use the next one for the Alpha/AXP if you need it
-#LDFLAGS = -L../staticlib 
+LDFLAGS = -L../staticlib 
 LIBS = -lvga -lm
 
 #----------------------------------------------------------------------
@@ -31,10 +31,10 @@ OBJECTS += fix132x43.o setmclk.o
 endif
 
 .c.o:
-	$(CC) $(CFLAGS) -c -o $*.o $<
+	$(CC) -m32 $(CFLAGS) -c -o $*.o $<
 
 .o:
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $* $*.o $(LIBS)
+	$(CC) -m32 $(CFLAGS) $(LDFLAGS) -o $* $*.o $(LIBS)
 	chmod 4755 $*
 
 all: $(UTILPROGS)
@@ -43,10 +43,10 @@ all: $(UTILPROGS)
 $(OBJECTS): .depend
 
 convfont: convfont.o
-	$(CC) $(CFLAGS) $(LDFLAGS) -o convfont convfont.o $(LIBS)
+	$(CC) -m32 $(CFLAGS) $(LDFLAGS) -o convfont convfont.o $(LIBS)
 
 gtfcalc: gtf/gtfcalc.c
-	$(CC) $(CFLAGS) $(LDFLAGS) -o gtfcalc -DTESTING_GTF gtf/gtfcalc.c $(LIBS)
+	$(CC) -m32 $(CFLAGS) $(LDFLAGS) -o gtfcalc -DTESTING_GTF gtf/gtfcalc.c $(LIBS)
 
 clean:
 	rm -f $(UTILPROGS) *.o *~ UVCONFIG.CRT
