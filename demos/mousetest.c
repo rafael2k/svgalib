@@ -47,7 +47,7 @@ int main(void)
     gl_enableclipping();
 
 #ifdef MANUALLY_SETUP_MOUSE
-    mouse_init("/dev/mouse", MOUSE_MICROSOFT, MOUSE_DEFAULTSAMPLERATE);
+    mouse_init("/dev/input/mice", MOUSE_MICROSOFT, MOUSE_DEFAULTSAMPLERATE);
     mouse_setxrange(0, WIDTH - 1);
     mouse_setyrange(0, HEIGHT - 1);
     mouse_setwrap(MOUSE_NOWRAP);

@@ -6,8 +6,7 @@
 #include <string.h>		/* for memset */
 #include <unistd.h>
 #include <sys/mman.h>		/* for mmap */
-#include <asm/vm86.h>
-#include "lrmi.h"
+#include <libx86.h>
 #include "libvga.h"
 #include "driver.h"
 
@@ -49,13 +48,13 @@ static void vesa_setpage(int page)
 vesa_r.eax=0x4f05;
 vesa_r.ebx=0;
 vesa_r.edx=page*64/vesa_granularity;
-__svgalib_LRMI_callbacks->rm_int(0x10,&vesa_r);
+LRMI_int(0x10, &vesa_r);
 
 if(vesa_read_write){
    vesa_r.eax=0x4f05;
    vesa_r.ebx=1;
    vesa_r.edx=page*64/vesa_granularity;
-   __svgalib_LRMI_callbacks->rm_int(0x10,&vesa_r);
+   LRMI_int(0x10, &vesa_r);
 };
 }
 
@@ -88,7 +87,7 @@ static void vesa_getmodeinfo(int mode, vga_modeinfo *modeinfo)
     vesa_r.es = (unsigned int)vesa_data.mode >> 4;
     vesa_r.edi = (unsigned int)vesa_data.mode & 0xf;
 
-    if (!__svgalib_LRMI_callbacks->rm_int(0x10, &vesa_r)) {
+    if (!LRMI_int(0x10, &vesa_r)) {
        fprintf(stderr, "Can't get mode info (vm86 failure)\n");
        return;
     }
@@ -105,7 +104,7 @@ static int vesa_saveregs(uint8_t regs[])
   vesa_r.es=((long)buf)>>4;
   vesa_r.edx=1;
   vesa_r.ecx=__svgalib_VESA_savebitmap;
-  __svgalib_LRMI_callbacks->rm_int(0x10,&vesa_r);
+  LRMI_int(0x10, &vesa_r);
   memcpy(&regs[VGA_TOTAL_REGS],buf,vesa_regs_size);  
   
   return vesa_regs_size;
@@ -124,7 +123,7 @@ static void vesa_setregs(const uint8_t regs[], int mode)
   vesa_r.es=((long)buf)>>4;
   vesa_r.edx=2;
   vesa_r.ecx=__svgalib_VESA_savebitmap;
-  __svgalib_LRMI_callbacks->rm_int(0x10,&vesa_r);
+  LRMI_int(0x10, &vesa_r);
 }
 
 
@@ -178,7 +177,7 @@ static int vesa_setmode(int mode, int prv_mode)
         if(__svgalib_vesatext){
             vesa_r.eax=0x4f02; /* make sure we are in a regular VGA mode before we start */
             vesa_r.ebx=__svgalib_VESA_textmode;    /* without this, if we start in SVGA mode the result might */
-            __svgalib_LRMI_callbacks->rm_int(0x10,&vesa_r); /* be something weird */
+            LRMI_int(0x10, &vesa_r); /* be something weird */
         };
 	return __svgalib_vga_driverspecs.setmode(mode, prv_mode);
     }
@@ -215,7 +214,7 @@ static int vesa_setmode(int mode, int prv_mode)
 	}
 	vesa_set_crtc_info_regs();
     vesa_last_mode_set=vesa_r.ebx;
-    __svgalib_LRMI_callbacks->rm_int(0x10,&vesa_r);
+    LRMI_int(0x10, &vesa_r);
 
     vesa_data.info = LRMI_mem2 ;
     vesa_data.mode = (struct vbe_mode_info_block *)(vesa_data.info + 1);
@@ -223,7 +222,7 @@ static int vesa_setmode(int mode, int prv_mode)
     vesa_r.ecx=SVGALIB_VESA[mode];
     vesa_r.es = (unsigned int)vesa_data.mode >> 4;
     vesa_r.edi = (unsigned int)vesa_data.mode&0xf;    
-    __svgalib_LRMI_callbacks->rm_int(0x10, &vesa_r);
+    LRMI_int(0x10, &vesa_r);
     vesa_logical_width=vesa_data.mode->bytes_per_scanline;
     vesa_bpp=(vesa_data.mode->bits_per_pixel+7)/8;
     if(vesa_logical_width==0) vesa_logical_width=vesa_bpp*vesa_data.mode->x_resolution;
@@ -262,8 +261,8 @@ static void vesa_lock(void)
 
 static int vesa_test(void)
 {
-        __svgalib_LRMI_callbacks->rm_init();
-        LRMI_mem2 = __svgalib_LRMI_callbacks->rm_alloc_real(sizeof(struct vbe_info_block)
+        LRMI_init();
+        LRMI_mem2 = LRMI_alloc_real(sizeof(struct vbe_info_block)
                                         + sizeof(struct vbe_mode_info_block));
 	vesa_data.info = LRMI_mem2;
 	vesa_data.mode = (struct vbe_mode_info_block *)(vesa_data.info + 1);
@@ -271,9 +270,9 @@ static int vesa_test(void)
 	vesa_r.es = (unsigned int)vesa_data.info >> 4;
 	vesa_r.edi = 0;
 
-        __svgalib_LRMI_callbacks->rm_free_real(LRMI_mem2);
+        LRMI_free_real(LRMI_mem2);
 
-        __svgalib_LRMI_callbacks->rm_int(0x10, &vesa_r);
+        LRMI_int(0x10, &vesa_r);
         if (vesa_r.eax!=0x4f) return 0;
         return !vesa_init(0,0,0);
 }
@@ -285,14 +284,14 @@ static void vesa_setrdpage(int page)
 vesa_r.eax=0x4f05;
 vesa_r.ebx=vesa_read_window;
 vesa_r.edx=page*64/vesa_granularity;
-__svgalib_LRMI_callbacks->rm_int(0x10,&vesa_r);
+LRMI_int(0x10, &vesa_r);
 }
 static void vesa_setwrpage(int page)
 {
 vesa_r.eax=0x4f05;
 vesa_r.ebx=vesa_write_window;
 vesa_r.edx=page*64/vesa_granularity;
-__svgalib_LRMI_callbacks->rm_int(0x10,&vesa_r);
+LRMI_int(0x10, &vesa_r);
 }
 
 
@@ -305,7 +304,7 @@ static void vesa_setdisplaystart(int address)
   vesa_r.ecx=address % vesa_logical_width;
   vesa_r.edx=address / vesa_logical_width;
 
-  __svgalib_LRMI_callbacks->rm_int(0x10,&vesa_r);
+  LRMI_int(0x10, &vesa_r);
 
 }
 
@@ -316,7 +315,7 @@ static void vesa_setlogicalwidth(int width)
   vesa_r.eax=0x4f06;
   vesa_r.ebx=0;
   vesa_r.ecx=width / vesa_bpp ;
-  __svgalib_LRMI_callbacks->rm_int(0x10,&vesa_r);
+  LRMI_int(0x10, &vesa_r);
   vesa_logical_width=vesa_r.ebx;
 
 }
@@ -327,7 +326,7 @@ if (op==LINEAR_ENABLE) {
   vesa_r.eax=0x4f02;
   vesa_r.ebx=vesa_last_mode_set|0x4000;
   vesa_set_crtc_info_regs();
-  __svgalib_LRMI_callbacks->rm_int(0x10,&vesa_r);
+  LRMI_int(0x10, &vesa_r);
   vesa_is_linear=1;
 };
 
@@ -335,7 +334,7 @@ if (op==LINEAR_DISABLE){
   vesa_r.eax=0x4f02;
   vesa_r.ebx=vesa_last_mode_set;
   vesa_set_crtc_info_regs();
-  __svgalib_LRMI_callbacks->rm_int(0x10,&vesa_r);
+  LRMI_int(0x10, &vesa_r);
   vesa_is_linear=0;
 };
 if (op==LINEAR_QUERY_BASE) {return vesa_linear_base ;}
@@ -417,10 +416,10 @@ static int vesa_init(int force, int par1, int par2)
         vesa_memory=4096; 
     };
 
-    __svgalib_LRMI_callbacks->rm_init();
+    LRMI_init();
     for(i=0;i<__GLASTMODE;i++)SVGALIB_VESA[i]=IS_IN_STANDARD_VGA_DRIVER(i);
 
-    vesa_data.info = __svgalib_LRMI_callbacks->rm_alloc_real(sizeof(struct vbe_info_block)
+    vesa_data.info = LRMI_alloc_real(sizeof(struct vbe_info_block)
 	 + sizeof(struct vbe_mode_info_block));
     vesa_data.mode = (struct vbe_mode_info_block *)(vesa_data.info + 1);
     vesa_r.eax = 0x4f00;
@@ -429,7 +428,7 @@ static int vesa_init(int force, int par1, int par2)
     
     memcpy(vesa_data.info->vbe_signature, "VBE2", 4);
 
-    __svgalib_LRMI_callbacks->rm_int(0x10, &vesa_r);
+    LRMI_int(0x10, &vesa_r);
     
     if ((vesa_r.eax & 0xffff) != 0x4f || strncmp(vesa_data.info->vbe_signature, "VESA", 4) != 0) {
        	fprintf(stderr,"No VESA bios detected!\n");
@@ -452,7 +451,7 @@ static int vesa_init(int force, int par1, int par2)
        vesa_r.es = (unsigned int)vesa_data.mode >> 4;
        vesa_r.edi = (unsigned int)vesa_data.mode & 0xf;
 
-       if (!__svgalib_LRMI_callbacks->rm_int(0x10, &vesa_r)) {
+       if (!LRMI_int(0x10, &vesa_r)) {
           fprintf(stderr, "Can't get mode info (vm86 failure)\n");
           return 1;
        }
@@ -578,9 +577,9 @@ static int vesa_init(int force, int par1, int par2)
     vesa_r.edx=0;
     vesa_r.ecx=__svgalib_VESA_savebitmap;
     vesa_r.ebx=0;
-    __svgalib_LRMI_callbacks->rm_int(0x10,&vesa_r);
+    LRMI_int(0x10, &vesa_r);
     vesa_regs_size=vesa_r.ebx*64;
-    __svgalib_LRMI_callbacks->rm_free_real(vesa_data.info);
+    LRMI_free_real(vesa_data.info);
 
     SVGALIB_VESA[TEXT]=3;
 
@@ -600,8 +599,8 @@ static int vesa_init(int force, int par1, int par2)
     cardspecs->matchProgrammableClock=vesa_match_programmable_clock;
     __svgalib_driverspecs = &__svgalib_vesa_driverspecs;
 
-    LRMI_mem1 = __svgalib_LRMI_callbacks->rm_alloc_real(vesa_regs_size);
-    LRMI_mem2 = __svgalib_LRMI_callbacks->rm_alloc_real(sizeof(struct vbe_info_block)
+    LRMI_mem1 = LRMI_alloc_real(vesa_regs_size);
+    LRMI_mem2 = LRMI_alloc_real(sizeof(struct vbe_info_block)
                                     + sizeof(struct vbe_mode_info_block));
 
     __svgalib_banked_mem_base=0xa0000;

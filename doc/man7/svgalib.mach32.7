@@ -13,7 +13,7 @@ svgalib.mach32 \- Information on the Mach32 chipset driver
 .br
 .BR " 4. " "Third party cards"
 .br
-.BR " 5. " "Logical linewidth"
+.BR " 5. " "Logical line width"
 .br
 .BR " 6. " "Noisy video signals"
 .br
@@ -195,7 +195,7 @@ commands below (if they have problems with the default settings).
 I had to learn that those cards seem
 to use not only non standard clocks for the Mach32, but also for the included
 SVGA. However, since people often like to use proprietary, non standard VGA
-(read 80x25) textmodes, the Mach32 driver has to set the included SVGA to
+(read 80x25) text modes, the Mach32 driver has to set the included SVGA to
 a VGA compatible clock frequency. Otherwise svgalib has problems using plain VGA
 modes. This screws VGA modes up if these clocks have different values on third
 party Mach32 cards.
@@ -224,7 +224,7 @@ Often
 is special in that the
 driver will not touch any SVGA timings. This requires the Mach32 SVGA part to
 be in a VGA compatible mode when the svgalib application is started, that is,
-you must use 80x25 (maybe 80x50) console textmodes.
+you must use 80x25 (maybe 80x50) console text modes.
 .PP
 
 As I mentioned already,
@@ -236,7 +236,7 @@ locks up the card & system. Fortunately
 is only used for some DAC fine tuning (actually the setting you can
 fine tune with the
 .B blank
-command) which is only of barely noticable effect to the screen.
+command) which is only of barely noticeable effect to the screen.
 
 The following configuration commands exist to support AST cards:
 
@@ -332,7 +332,7 @@ Ramdac type is queried from Mach32 chip.
 
 .IP
 .I memory
-is the amount of videomemory in KB.
+is the amount of video memory in KB.
 .PP
 Note that the type of the ramdac can be set more conveniently with the
 .B ramdac
@@ -340,19 +340,19 @@ command.
 
 .SH 5. LOGICAL LINEWIDTH
 At least my VRAM card seems to be very peculiar about logical
-linewidths. From my experience a multiple of 64 pels is needed.
+line widths. From my experience a multiple of 64 pels is needed.
 Your mileage may vary. Use the config file options to adjust it
 and tell me if your card needs a different value. Include the name and
 model number of the card and what the correct numbers should be. This
 is so that I can correct the auto configuration of the driver.
 
 If some svgalib application has problems, note that you can
-force the logical linewidth to the default value from the
-configfile. Probably this will lead to glitches in some 800x600
+force the logical line width to the default value from the
+config file. Probably this will lead to glitches in some 800x600
 resolutions. You can
 .B inhibit
-these resolutions from the configfile
-as well. Apropos glitches, I found no guidelines as to what clockrates
+these resolutions from the config file
+as well. Apropos glitches, I found no guidelines as to what clock rates
 to use due to memory restrictions. I adjusted the driver, such that
 I get a stable pic in all resolutions. However sometimes the screen
 is disturbed by heavy video memory accesses. If you don't like that,
@@ -514,7 +514,7 @@ Then you can decide to use the partial info that is still in it. Use
 
 .B mach32eeprom ignore usetimings
 
-to use the videomodes that are defined in the EEPROM (if no better modes are
+to use the video modes that are defined in the EEPROM (if no better modes are
 known by the driver). This is usually safe, because the driver knows
 which modes are safe for your hardware (if
 .BR clocks ", " monitor " and " ramdac
@@ -589,17 +589,17 @@ are:
 Don't complain about checksum and don't use any EEPROM contents.
 .TP
 .B useaperture
-Use the configuration for the memoryaperture given in the EEPROM.
+Use the configuration for the memory aperture given in the EEPROM.
 .TP
 .B usetimings
-Use videomodes found in the EEPROM of the board.
+Use video modes found in the EEPROM of the board.
 .TP
 .B nofile
 Forget about any filename that maybe was already configured.
 Don't read a file, don't create one.
 .TP
 .BI "file " filename
-Newstyle form to specify the
+New style form to specify the
 .IR filename ;
 On contrary to the
 .BI "mach32eeprom " filename
@@ -672,7 +672,7 @@ cannot use that, use
 to find the address in
 .B MEM_CFG.
 Then,
-.BR "if it is a senseable setting for your system" ,
+.BR "if it is a sensible setting for your system" ,
 enable a 4MB aperture at that address with
 .BR setuplinear .
 Ensure that no other card or memory uses the address range you choose.
@@ -717,14 +717,14 @@ This is no hard restriction as the 16 clocks of the Mach32 can be divided by 2.
 Thus if you setup some mode yourself try to use one of the divided clocks in
 your timings and I can use the undivided clocks internally.
 
-It is a real restriction for 16M colors. ATI themself only supports 25MHz
+It is a real restriction for 16M colors. ATI itself only supports 25MHz
 (640x480) here by use of a 75MHz clock. Depending on your clock chip other
 values may be usable as well. Even the doubled/tripled clocks have to be less
 than the magic 80 MHz. However the driver does all this itself. It may just
 happen that some of the predefined or one of your handmade mode-timings
 can't be used because the clock that is used cannot be doubled/tripled.
 Even though there is already some tolerance in the driver you may fix that by
-slighty changing the clock values that you set with the
+slightly changing the clock values that you set with the
 .B clocks
 command. But
 note that this will as well affect the ability of the driver to calculate

@@ -25,10 +25,16 @@
 #include <sys/kd.h>
 #include <sys/ioctl.h>
 #include <sys/stat.h>
+#if defined(__linux__)
 #include <sys/vt.h>
+#elif defined(__FreeBSD_kernel__)
+#include <sys/consio.h>
+#endif
 #include <sys/wait.h>
 #include <sys/syslog.h>
+#ifdef IO_DRIVERS
 #include <sys/io.h>
+#endif
 
 #ifdef INCLUDE_VESA_DRIVER
 #include <sys/vm86.h>
@@ -64,6 +70,11 @@
 #define USE_DEVTTY
 
 //#define SET_TERMIO
+
+/* If the system does not support IUCLC, ignore it. */
+#ifndef IUCLC
+#define IUCLC 0
+#endif
 
 #define SETSIG(sa, sig, fun) {\
 	sa.sa_handler = fun; \
@@ -438,7 +449,7 @@ int mouse_open = 0;
 static int mouse_mode = 0;
 static int mouse_type = -1;
 static int mouse_modem_ctl = 0;
-char *__svgalib_mouse_device = "/dev/mouse";
+char *__svgalib_mouse_device = "/dev/input/mouse";
 int __svgalib_mouse_flag;
 static char *helper_device = "/dev/svga";
 static int __svgalib_oktowrite = 1;
@@ -486,7 +497,14 @@ int __svgalib_flipchar = '\x1b';		/* flip character - initially  ESCAPE */
 
 /* Chipset specific functions */
 
+#if defined(INCLUDE_VGA_DRIVER)
 DriverSpecs *__svgalib_driverspecs = &__svgalib_vga_driverspecs;
+#elif defined(INCLUDE_FBDEV_DRIVER)
+DriverSpecs *__svgalib_driverspecs = &__svgalib_fbdev_driverspecs;
+#else
+#warning "Please enable either vgadrv or fbdev as base drivers."
+#endif
+
 
 static void (*__svgalib_setpage) (int);	/* gives little faster vga_setpage() */
 static void (*__svgalib_setrdpage) (int) = NULL;
@@ -513,7 +531,9 @@ inline void vga_setpage(int p);
 DriverSpecs *__svgalib_driverspecslist[] =
 {
     NULL,			/* chipset undefined */
+#ifdef INCLUDE_VGA_DRIVER
     &__svgalib_vga_driverspecs,
+#endif
 #ifdef INCLUDE_ET4000_DRIVER
     &__svgalib_et4000_driverspecs,
 #else
@@ -830,11 +850,13 @@ static void __svgalib_get_perm(void)
     }
     else
     {
+#ifdef IO_DRIVERS
     if (__svgalib_nohelper)
     {
 	iopl(3);
 	ioperm(0, 0x400, 1);
     }
+#endif
     
     /* Open /dev/svga */
     open_mem();
@@ -1083,7 +1105,11 @@ static char sig2catch[] =
  SIGTRAP, SIGIOT, SIGBUS, SIGFPE,
  SIGSEGV, SIGPIPE, SIGALRM, SIGTERM,
  SIGXCPU, SIGXFSZ, SIGVTALRM,
-/* SIGPROF ,*/ SIGPWR};
+/* SIGPROF ,*/
+#ifdef SIGPWR
+SIGPWR
+#endif
+};
 static struct sigaction old_signal_handler[sizeof(sig2catch)];
 
 struct vt_mode __svgalib_oldvtmode;
@@ -1353,9 +1379,11 @@ int __svgalib_getchipset(void)
 	    CHIPSET = VESA;
 	else
 #endif
+#ifdef INCLUDE_VGA_DRIVER_TEST
 	if (!__svgalib_driverspecslist[VGA]->disabled && __svgalib_vga_driverspecs.test())
 	    CHIPSET = VGA;
 	else
+#endif
 	    /* else */
 	{
 	    fprintf(stderr, "svgalib: Cannot find EGA or VGA graphics device.\n");
@@ -1625,7 +1653,7 @@ static void initialize(void)
 
 #ifndef SET_TERMIO
     /* save text mode termio parameters */
-    ioctl(0, TCGETS, &__svgalib_text_termio);
+    tcgetattr(0, &__svgalib_text_termio);
 
     __svgalib_graph_termio = __svgalib_text_termio;
 
@@ -2286,9 +2314,11 @@ vga_modeinfo *vga_getmodeinfo(int mode)
 		return &modeinfo;
     }
     modeinfo.flags = 0;
+#if defined(INCLUDE_VGA_DRIVER)
     if ((STDVGAMODE(mode) && mode != G320x200x256) || is_modeX)
 		__svgalib_vga_driverspecs.getmodeinfo(mode, &modeinfo);
     else
+#endif
 		/* Get chipset specific info for SVGA modes and */
 		/* 320x200x256 (chipsets may support more pages) */
 		chipset_getmodeinfo(mode, &modeinfo);
@@ -2591,7 +2621,9 @@ static void savestate(void)
 		memcpy(graph_buf, GM, GRAPH_SIZE);
     } else if (MODEX || CM == G800x600x16 || (STDVGAMODE(CM) && CM != G320x200x256)) {
 		/* for planar VGA modes, save the full 256K */
+#if defined(INCLUDE_VGA_DRIVER)
 		__svgalib_vga_driverspecs.setmode(GPLANE16, prv_mode);
+#endif
 		alloc_graph_buf(4*GRAPH_SIZE);
 		for (i = 0; i < 4; i++) {
 	    	/* save plane i */
@@ -2901,7 +2933,9 @@ void vga_setdisplaystart(int a)
 			/* SVGA card, use the standard VGA function */
 			/* that works properly for Mode X. */
 			/* Same goes for 16 color modes. */
+#if defined(INCLUDE_VGA_DRIVER)
 			__svgalib_vga_driverspecs.setdisplaystart(a);
+#endif
 			return;
 		}
     /* Call the regular display start function for the chipset */
@@ -4206,7 +4240,7 @@ int vga_init(void)
 #ifdef SET_TERMIO
     if(!__svgalib_novccontrol) {
             /* save text mode termio parameters */
-            ioctl(0, TCGETS, &__svgalib_text_termio);
+            tcgetattr(0, &__svgalib_text_termio);
     
             __svgalib_graph_termio = __svgalib_text_termio;
     

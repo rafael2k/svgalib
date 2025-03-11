@@ -228,7 +228,7 @@
 #endif
 
 /* 32-bit FreeBSD compile environment */
-#elif	defined(__FREEBSD__)
+#elif	defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
 #ifndef	__32BIT__
 #define __32BIT__
 #endif
@@ -358,6 +358,18 @@
 #define	_ASMAPIP	_ASMAPI *
 #endif
 
+/* We want the _POSIX_VERSION macro if available. */
+#ifdef __UNIX__
+#include <unistd.h>
+#endif
+
+/* Ideally we'd detect if the function is present at build time regardless
+ * of standards, but this is better than nothing. */
+#if (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) || \
+    (defined(_POSIX_VERSION) &&  _POSIX_VERSION >= 200112L)
+#define HAVE_ROUND
+#endif
+
 /* Useful macros */
 
 #define PRIVATE static
@@ -389,7 +401,7 @@
 #if defined(__BEOS__)
 #include <SupportDefs.h>
 #else
-#ifdef __LINUX__
+#if defined(__GLIBC__) || defined(__LINUX__)
 #include <sys/types.h>
 #ifdef __STRICT_ANSI__
 typedef unsigned short  ushort;

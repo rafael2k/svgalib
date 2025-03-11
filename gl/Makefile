@@ -10,12 +10,17 @@ include ../Makefile.cfg
 srcdir    = ..
 VPATH     = $(srcdir)/gl
 
+INCLUDES += -I$(srcdir)/src
+
 ifeq (a.out, $(TARGET_FORMAT))
   DEFINES += -DSVGA_AOUT
 endif
 
 ifeq (y, $(NO_ASM))
   DEFINES += -DNO_ASSEMBLY
+endif
+ifeq (y, $(IO_DRIVERS))
+  DEFINES += -DIO_DRIVERS
 endif
 
 #----------------------------------------------------------------------
@@ -28,9 +33,12 @@ MODULES	 = grlib.o driver.o line.o palette.o scale.o text.o font8x8.o \
 all:	libvgagl.a
 .PHONY: all clean dep
 
+libvgagl.so: libvgagl.so.$(VERSION)
 libvgagl.so.$(VERSION): $(MODULES)
 	$(CC) -s -shared -Wl,-soname,libvgagl.so.$(MAJOR_VER) -o libvgagl.so.$(VERSION) \
-	  $(MODULES)
+	  $(MODULES) $(SHLIBLIBS) -L$(srcdir)/sharedlib -lvga
+	ln -sf libvgagl.so.$(VERSION) libvgagl.so
+	ln -sf libvgagl.so.$(VERSION) libvgagl.so.$(MAJOR_VER)
 
 libvgagl.a: $(MODULES)
 	rm -f libvgagl.a
@@ -63,7 +71,7 @@ dep:
 	$(CC) $(INCLUDES) -MM $(patsubst %.o,$(srcdir)/gl/%.c,$(MODULES)) >>.depend.gl
 
 clean:
-	rm -f .depend.gl *.bak *.o *~ libvgagl.a libvgagl.so.$(VERSION)
+	rm -f .depend.gl *.bak *.o *~ libvgagl.a libvgagl.so*
 
 #
 # include a dependency file if one exists

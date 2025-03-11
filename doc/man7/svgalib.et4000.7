@@ -27,7 +27,7 @@ svgalib.et4000, libvga.et4000 \- Information for Tseng ET4000 users
 
 .SH 1. BASICS OF ET4000 CARDS 
 
-Basicly all ET4000 cards are equal, some are even more equal ...
+Basically all ET4000 cards are equal, some are even more equal ...
 
 The Chipset is well documented (by Tseng Labs and eg. the vgadoc2.zip)
 and all graphics functions can be used the same way on different cards
@@ -52,7 +52,7 @@ VRAM equipped cards, please tell us about.
 
 By now we found is no reliable way to detect the memory organisation/
 timing and the DAC type/capabilities. Most modern card use a frequency
-synthizier and provide the following pixel frequencies (in MHz):
+synthesizer and provide the following pixel frequencies (in MHz):
 
 .RS
 .B 50.350 56.644 65.0 72.0 80.0 89.8 63.0 75.0
@@ -214,7 +214,7 @@ Most ET4000 cards provide 640x350 and 640x400 graphics modes. The
 generates the related register sets. You may also use
 .BR dumpreg (1)
 from an X window to grab you favourite X graphics mode.
-The X mode normaly isn't usable directly. See
+The X mode normally isn't usable directly. See
 .I cardex.w32
 for an example and
 .I et4000.c
@@ -232,7 +232,7 @@ register set to
 
 In the
 .I et4000/
-subdir of teh svgalib distribution you'll find some sample register sets:
+subdir of the svgalib distribution you'll find some sample register sets:
 
 .TP
 .B cardex.w32
@@ -269,8 +269,8 @@ the
 
 Newer ET4000 chipsets (eg. W32 and W32i) allow up to 32 clock 
 frequencies. Two additional register values were added just before the
-old extened register value. The new registers are CRTC/30h and CRTC/31h.
-The old register set had 71 values, the new growed to 73.
+old extended register value. The new registers are CRTC/30h and CRTC/31h.
+The old register set had 71 values, the new has grown to 73.
 You may update your old register set by hand:
 
 .IP -
@@ -283,7 +283,7 @@ for each mode
 .RS
 change the number of register values from 71 to 73
 .br
-add the values from dumreg output at front of last data line
+add the values from dumpreg output at front of last data line
 .RE
 .RE
 .IP -

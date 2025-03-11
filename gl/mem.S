@@ -76,7 +76,7 @@ ENTRY(memcpy4to3)
 	jz 4f			/* none left */
 
 3:	movl (%esi),%eax
-	movw %eax,(%edi)
+	movw %ax,(%edi)
 	shrl $16,%eax
 	movb %al,2(%edi)
 	addl $4,%esi

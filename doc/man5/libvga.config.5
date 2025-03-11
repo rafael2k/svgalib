@@ -12,7 +12,7 @@ and the end of the line is ignored. Empty lines are also
 ignored. Since the driver you will use may not know all config options
 here, unknown commands are silently ignored. Please think of that when
 something does not work as you expect. I know this is a nuisance
-because misformed configuration statements do not cause
+because malformed configuration statements do not cause
 errors. Multiple commands are allowed in one line, and commands can
 exceed lines.
 
@@ -65,7 +65,7 @@ except for debugging/testing purposes.
 
 .SH REQUIRED CONFIGURATION
 Please do not allow the vastness of options to confuse you. Generally
-svgalib uses well choosen defaults and is able to autodetect
+svgalib uses well chosen defaults and is able to autodetect
 everything. Thus generally you don't need to specify much. When
 installing svgalib it provides a sample
 .I /etc/vga/libvga.config
@@ -80,10 +80,10 @@ To specify if you use anything else then a Microsoft compatible mouse.
 .B mdev
 If the mouse device file is
 .B not
-.I /dev/mouse
-which is generally a symbolic link to the actual mouse device
-file. You will usually need to use this command if you want to use the
-SpaceTec Spaceball device (which is not your usual mouse).
+.I /dev/input/mice
+which is the actual mouse device file. You will usually need to use this
+command if you want to use the SpaceTec Spaceball device (which is not
+your usual mouse).
 
 .TP
 .BR setRTS ", " clearRTS ", " leaveRTS ", " setDTR ", " clearDTR ", and " leaveDTR
@@ -131,7 +131,7 @@ if you have an Icd2061a clockchip.
 if your Ramdac is not detected properly.
 .TP
 .BI "Dacspeed " speed
-if the default choosen is not right (probably too restrictive).
+if the default chosen is not right (probably too restrictive).
 .PP
 The remaining options are really only to be used in case of problems
 which you'll not generally encounter.
@@ -203,8 +203,8 @@ anyway.
 .TP
 .BI "mdev " mousedevice
 Usually
-.I /dev/mouse
-(the default) will be a link to the mouse device.
+.I /dev/input/mice
+(the default) will be the mouse device.
 However, esp. with the Spacetec Spaceball you may
 want to specify a different device for
 .BR svgalib (7)
@@ -252,8 +252,8 @@ Other mice might need
 .B clearDTR
 as well or one set and clear. Try yourself.
 
-Note: Having crtscts handshake enabled on the mouse tty may interfer with this
-options. Do not do that.
+Note: Having crtscts handshake enabled on the mouse tty may interfere with this
+option. Do not do that.
 
 Finally, a special goodie for wheel mice:
 
@@ -374,7 +374,7 @@ linear
 The acceleration factor grows linear with the delta until it
 reaches
 .BR mouse_accel_thresh .
-After that it is a simple mutiplication.
+After that it is a simple multiplication.
 (I know that it can be done with setting
 .B mouse_accel_power
 to 1, but
@@ -641,7 +641,7 @@ Sync polarity, interlace mode
 Everything should be on one line.
 The values for the horizontal timings must be multiples of eight.
 
-These are prefered over the default timings (if monitor and chipset
+These are preferred over the default timings (if monitor and chipset
 can handle them).
 The format is identical to the one used by XFree86, but the label
 following the modeline keyword is ignored by vgalib.
@@ -821,7 +821,7 @@ Configure for a programmable clockchip.
 .B ICD2061A
 is the only one supported right now.
 
-.SS Miscanellous options
+.SS Miscellaneous options
 .TP
 .B security revoke-all-privs
 Make sure it is impossible to regain root access
@@ -1144,7 +1144,7 @@ Valid
 are
 .BR bit ", " fill ", " image ", and " hlinelist .
 They enable support for the
-corresponding blit functions. Preceed them with
+corresponding blit functions. Precede them with
 .B no
 to turn them off (no space after
 .B no

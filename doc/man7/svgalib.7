@@ -202,7 +202,7 @@ Please see
 for details.
 
 There are demos with sources available which will also help to get you started, in
-recomended order of interest:
+recommended order of interest:
 .BR vgatest (6),
 .BR keytest (6),
 .BR mousetest (6),
@@ -247,7 +247,7 @@ calls before it returns to the debugger, you can omit that, of course.
 This will only work if your program and the debugger run in the same virtual linux console.
 
 .SH 3. DESCRIPTION OF SVGALIB FUNCTIONS
-Each function has it's own section 3 manual page. For a list of
+Each function has its own section 3 manual page. For a list of
 .BR vgagl " functions see " vgagl (7).
 
 .PD 0
@@ -756,7 +756,7 @@ force noninterlaced.
 .B bit0 = false
 force interlaced which only matters on 8900's with at least 1M
 since there is no 512K interlaced mode on the 8900 or any of the other cards.
-.RH
+.RE
 
 .SS Tseng ET4000/ET4000W32(i/p)
 
@@ -859,7 +859,7 @@ Please see
 .SS ATI Mach64
 The rage.c driver works only on mach64 based cards with internal DAC.
 The driver might misdetect the base frequency the card uses, so if when setting
-any svgalib modes the screen blanks, or complains about out of bound freqencies,
+any svgalib modes the screen blanks, or complains about out of bound frequencies,
 or the display is unsynced, then try adding the option
 .BR RageDoubleClock
 to the config file.
@@ -920,7 +920,7 @@ Frodo Looijaard <frodol@dds.nl> to reenable OTI-067 support. It is unknown
 right now if they might have broken OTI-087 support. The author of the '87
 support Christopher Wiles <wileyc@moscow.com> owns no longer an OTI-087 card and
 can thus no longer give optimal support to this driver. Thus you might be
-better off contacting me or Frodo for questions. If you are a knowledgable
+better off contacting me or Frodo for questions. If you are a knowledgeable
 OTI-087 user and experience problems you are welcome to provide fixes.
 No user of a OTI-087 is currently
 known to me, so if you are able to fix problems with the driver please do so

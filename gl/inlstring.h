@@ -258,7 +258,7 @@ static inline void *
 	       "cmpl $0,%%edx\n\t"	/* none left? */
 	       "jle 4f\n\t"	/* finished */
 
-	       "mov %%ecx,%%eax\n\t"
+	       "movl %%ecx,%%eax\n\t"
 	       "shrl $8,%%ecx\n\t"	/* R in cl */
 
 	       "3:\n\t"		/* write last few pixels */

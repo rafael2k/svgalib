@@ -36,7 +36,11 @@
 #else
 #define NR_KEYS 128
 #endif
+#if defined(__linux__)
 #include <sys/vt.h>
+#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+#include <sys/consio.h>
+#endif
 /* Needed to check uid of keymap files */
 #include <sys/stat.h>
 #include <unistd.h>
@@ -594,7 +598,6 @@ static int keyboard_getevents(int wait)
 	    /* VT switch. */
 	    /* *** what about F11 & F12? */
 	    int j, vt = 0;
-	    struct vt_stat vts;
 	    for (j = 0; j < 12; j++)
 		if (functionkey_state & (1 << j)) {
 		    vt = j + 1;
@@ -603,9 +606,7 @@ static int keyboard_getevents(int wait)
 		}
 
 	    /* Do not switch vt's if need not to */
-	    ioctl(__svgalib_tty_fd, VT_GETSTATE, &vts);
-
-	    if(vt != vts.v_active) { 
+	    if(vt != __svgalib_get_vtactive(__svgalib_tty_fd)) {
 	        /* if switching vt's, need to clear keystates */
 	        keyboard_clearstate();
 	        /*

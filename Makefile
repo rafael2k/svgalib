@@ -96,11 +96,9 @@ installsharedlib: $(SHAREDLIBS) $(SVGALIBSHAREDSTUBS)
 	@mkdir -p ${sharedlibdir};
 	@for foo in $(notdir $(SHAREDLIBS)); do \
 		$(INSTALL_SHLIB) sharedlib/$$foo $(sharedlibdir)/$$foo; \
-		(cd $(sharedlibdir); \
-		 ln -sf $$foo `echo $$foo | sed 's/\.so\..*/.so/'` ); \
+		cp -d sharedlib/`echo $$foo | sed 's/\.so\..*/.so/'` $(sharedlibdir); \
+		cp -d sharedlib/`echo $$foo | sed 's/\.so\..*/.so/'`.$(MAJOR_VER) $(sharedlibdir); \
 	done
-	@./fixldsoconf
-	-ldconfig
 
 installstaticlib: static
 	@echo Installing static libraries in $(libdir).
@@ -115,26 +113,30 @@ installutils: textutils $(LRMI)
 		echo No $(bindir) directory, creating it.; \
 		mkdir -p $(bindir); \
 	fi
+ifeq (y, $(IO_DRIVERS))
 	@echo Installing textmode utilities in $(bindir):
 	@echo "restorefont:      Save/restore textmode font."
-	@$(INSTALL_PROGRAM) utils/restorefont $(bindir)
+	@$(INSTALL_SUID) utils/restorefont $(bindir)
 	@echo "restorepalette:   Set standard VGA palette."
-	@$(INSTALL_PROGRAM) utils/restorepalette $(bindir)
+	@$(INSTALL_SUID) utils/restorepalette $(bindir)
 	@echo "dumpreg:          Write ASCII dump of SVGA registers."
-	@$(INSTALL_PROGRAM) utils/dumpreg $(bindir)
+	@$(INSTALL_SUID) utils/dumpreg $(bindir)
 	@echo "restoretextmode:  Save/restore textmode registers."
-	@$(INSTALL_PROGRAM) utils/restoretextmode $(bindir)
+	@$(INSTALL_SUID) utils/restoretextmode $(bindir)
 	@echo "textmode:         Script that tries to restore textmode."
-	@$(INSTALL_SCRIPT) utils/textmode $(bindir)
+	@$(INSTALL_PROGRAM) utils/textmode $(bindir)
 	@echo "savetextmode:     Script that saves textmode information used by 'textmode'."
-	@$(INSTALL_SCRIPT) utils/savetextmode $(bindir)
+	@$(INSTALL_PROGRAM) utils/savetextmode $(bindir)
+endif
 ifeq ($(LRMI),lrmi)
-	@echo "mode3:       Restore textmode by setting VESA mode 3."
+	@echo "mode3:            Restore textmode by setting VESA mode 3."
 	@$(INSTALL_PROGRAM) lrmi-0.6m/mode3 $(bindir)
+	@echo "vga_reset:        Restore textmode by resetting graphic board."
+	@$(INSTALL_PROGRAM) lrmi-0.6m/vga_reset $(bindir)
 endif
 	@echo "Installing keymap utilities in $(bindir):"
 	@echo "svgakeymap:       Perl script that generates scancode conversion maps."
-	@$(INSTALL_SCRIPT) utils/svgakeymap $(bindir)
+	@$(INSTALL_PROGRAM) utils/svgakeymap $(bindir)
 
 installconfig:
 	mkdir -p ${datadir};
@@ -201,18 +203,12 @@ uninstall:
             rm -f $$i$$prog ; \
           done ; \
          done
-	@echo "Removing shared library stubs (old & current)..."
+	@echo "Removing shared library stubs..."
 	@for i in $(OBSOLETELDIRS); do \
 	    rm -f `echo /lib/libvga.so.$(VERSION) /lib/libvgagl.so.$(VERSION) \
-			$(OBSOLETELIBLINKS) /lib/libvga.sa /lib/libvgagl.sa \
+			$(OBSOLETELIBLINKS) \
 		     | sed s?/lib/?$$i?g`; \
          done
-ifndef KEEPSHAREDLIBS
-	@echo "Removing shared library images (old & current)..."
-	@for i in $(OBSOLETELDIRS); do \
-	    rm -f `echo $(OBSOLETESHAREDIMAGES) | sed s?/lib/?$$i?g`; \
-         done
-endif
 	@echo "Removing static libraries..."
 	@for i in $(OBSOLETELDIRS); do \
 	    rm -f `echo /lib/libvga.a /lib/libvgagl.a | sed s?/lib/?$$i?g`; \
@@ -290,12 +286,16 @@ demoprogs: $(PREDEMO) $(DEMODIRS)
 	done
 
 textutils: $(UTILDIRS)
+ifeq (y, $(IO_DRIVERS))
 	(cd utils; \
 	$(MAKE) -f $(SRCDIR)/utils/Makefile SRCDIR="$(SRCDIR)")
+endif
 
 lrmi:
+ifeq ($(LRMI),lrmi)
 	(cd lrmi-0.6m;\
 	$(MAKE))
+endif
 
 backup: $(BACKUP)
 
@@ -316,7 +316,6 @@ $(BACKUP):
 
 distclean:
 	(cd $(SRCDIR)/doc; $(MAKE) clean)
-	(cd $(SRCDIR)/doc; $(MAKE) ../0-README)
 	(cd $(SRCDIR)/src; $(MAKE) clean)
 	(cd $(SRCDIR)/gl; $(MAKE) clean)
 	(cd $(SRCDIR)/utils; $(MAKE) clean)

@@ -40,6 +40,8 @@
 *
 ****************************************************************************/
 
+#define _XOPEN_SOURCE 600
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -64,10 +66,12 @@ static GTF_constants GC = {
 
 /*-------------------------- Implementation -------------------------------*/
 
+#ifndef HAVE_ROUND
 static double round(double v)
 {
 	return floor(v + 0.5);
 }
+#endif
 
 static void GetInternalConstants(GTF_constants *c)
 /****************************************************************************

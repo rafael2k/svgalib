@@ -14,13 +14,13 @@ VPATH     = $(srcdir)/src
 # Compiler Section (overrides Makefile.cfg)
 #----------------------------------------------------------------------
 
-INCLUDES += -I$(srcdir)/src
+INCLUDES += -I$(srcdir)/src -I$(srcdir)/src/config
 
 #----------------------------------------------------------------------
 # Rules Section
 #----------------------------------------------------------------------
 
-DRIVERS = vgadrv.o regextr.o modetab.o
+DRIVERS = regextr.o modetab.o
 MODULES = vga.o vgaio.o \
           vgadraw.o vgaclear.o vgaline.o vgapix.o \
           vgapal.o vgacol.o vgamodesel.o vgamisc.o \
@@ -42,6 +42,9 @@ ifeq (y, $(USE_LRMI_9))
 endif
 ifeq (y, $(NO_ASM))
   DEFINES += -DNO_ASSEMBLY
+endif
+ifeq (y, $(IO_DRIVERS))
+  DEFINES += -DIO_DRIVERS
 endif
 ifdef SVGALIB_CONFIG_FILE
   DEFINES += -DSVGALIB_CONFIG_FILE=\"$(SVGALIB_CONFIG_FILE)\"
@@ -75,6 +78,13 @@ ifdef DEBUG_CONF
   DEFINES += -DDEBUG_CONF
 endif
 
+ifdef INCLUDE_VGA_DRIVER
+  VGA_DEFINES += -DINCLUDE_VGA_DRIVER
+  DRIVERS += vgadrv.o
+  ifdef INCLUDE_VGA_DRIVER_TEST
+    VGA_DEFINES += -DINCLUDE_VGA_DRIVER_TEST
+  endif
+endif
 ifdef INCLUDE_ET4000_DRIVER
   VGA_DEFINES += -DINCLUDE_ET4000_DRIVER
   DRIVERS += drivers/et4000.o drivers/et4000hico.o 
@@ -118,7 +128,7 @@ ifdef INCLUDE_OAK_DRIVER
 endif
 ifdef INCLUDE_EGA_DRIVER
   VGA_DEFINES += -DINCLUDE_EGA_DRIVER
-  DRIVERS += drivers/egadrv.o
+  DRIVERS += egadrv.o
   ifdef INCLUDE_EGA_DRIVER_TEST
     VGA_DEFINES += -DINCLUDE_EGA_DRIVER_TEST
   endif
@@ -198,7 +208,8 @@ ifdef INCLUDE_APM_DRIVER
 endif
 ifdef INCLUDE_VESA_DRIVER
   VGA_DEFINES +=-DINCLUDE_VESA_DRIVER
-  DRIVERS += drivers/vesa.o lrmi.o
+  DRIVERS += drivers/vesa.o
+  SHLIBLIBS += -lx86
   ifdef INCLUDE_VESA_DRIVER_TEST
     VGA_DEFINES += -DINCLUDE_VESA_DRIVER_TEST
   endif
@@ -449,13 +460,16 @@ all:	libvga.so.$(VERSION)
 libvga.so.$(VERSION): $(ALLOBJS)
 	$(CC) -shared -Wl,-soname,libvga.so.$(MAJOR_VER) \
 	-Xlinker --retain-symbols-file -Xlinker ../src/exports \
-	-Wl,-Bsymbolic -o libvga.so.$(VERSION) $(ALLOBJS) -lm
+	-Wl,-Bsymbolic -o libvga.so.$(VERSION) $(ALLOBJS) $(SHLIBLIBS) -lm
+	ln -sf libvga.so.$(VERSION) libvga.so
+	ln -sf libvga.so.$(VERSION) libvga.so.$(MAJOR_VER)
 
 $(sharedlibdir)/libvga.so.$(VERSION): libvga.so.$(VERSION)
 	$(INSTALL_SHLIB) $< $(sharedlibdir)/$<
-	-ldconfig
 
 install: $(sharedlibdir)/libvga.so.$(VERSION)
+	cp -df sharedlib/libvga.so $(sharedlibdir)/
+	cp -df sharedlib/libvga.so.$(MAJOR_VER) $(sharedlibdir)/
 
 endif	  
 
@@ -472,9 +486,11 @@ svgalib_helper.h:
 vga.o: vga.c
 	$(CC) $(CFLAGS) $(VGA_DEFINES) -c -o $@ $<
 
-#lrmi must NOT be compiled as -fPIC
+# XXX: Upstream used this so it may break, disabled to close an RC
+# lrmi must NOT be compiled as -fPIC
 lrmi.o: lrmi.c
-	$(CC) $(CFLAGS:-fPIC=) -c -o $@ $<
+	$(CC) $(CFLAGS) -c -o $@ $<
+#	$(CC) $(CFLAGS:-fPIC=) -c -o $@ $<
 
 $(RAMDAC): %.o: %.c
 	$(CC) $(CFLAGS) $(RAMDAC_DEFINES) -c -o $@ $<

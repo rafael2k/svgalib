@@ -13,9 +13,11 @@ VPATH     = $(srcdir)/utils
 # Compiler Section (overrides Makefile.cfg)
 #----------------------------------------------------------------------
 
-CFLAGS = $(WARN) $(OPTIMIZE) -I../include -L../sharedlib
+INCLUDES += -I../include -I$(srcdir)/src
+CFLAGS = $(WARN) $(OPTIMIZE) $(INCLUDES)
 #Use the next one for the Alpha/AXP if you need it
 #LDFLAGS = -L../staticlib 
+LDFLAGS = -L$(srcdir)/sharedlib
 LIBS = -lvga -lm
 
 #----------------------------------------------------------------------
@@ -35,7 +37,6 @@ endif
 
 .o:
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $* $*.o $(LIBS)
-	chmod 4755 $*
 
 all: $(UTILPROGS)
 .PHONY: all clean cleanbin dep

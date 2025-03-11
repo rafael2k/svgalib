@@ -1,10 +1,13 @@
+#ifdef IO_DRIVERS
 #include <sys/io.h>
 #include <sys/ioctl.h>
+#endif
 #include "svgalib_helper.h"
 #include "libvga.h"
 
 void __svgalib_port_rep_outb(unsigned char* string, int length, int port)
 {
+#ifdef IO_DRIVERS
   if(__svgalib_nohelper)
   {
     outsb(port, string, length);
@@ -19,10 +22,12 @@ void __svgalib_port_rep_outb(unsigned char* string, int length, int port)
     
     ioctl(__svgalib_mem_fd,SVGAHELPER_REPOUTB,&iostr); 
   }
+#endif
 }
 
 void __svgalib_port_out(int value, int port)
 {
+#ifdef IO_DRIVERS
   if(__svgalib_nohelper)
   {
     outb(value, port);
@@ -35,10 +40,12 @@ void __svgalib_port_out(int value, int port)
     iov.port=port;
     ioctl(__svgalib_mem_fd,SVGAHELPER_OUTB,&iov);
   }
+#endif
 }
 
 void __svgalib_port_outw(int value, int port)
 {
+#ifdef IO_DRIVERS
   if(__svgalib_nohelper)
   {
     outw(value, port);
@@ -51,10 +58,12 @@ void __svgalib_port_outw(int value, int port)
     iov.port=port;
     ioctl(__svgalib_mem_fd,SVGAHELPER_OUTW,&iov);
   }
+#endif
 }
 
 void __svgalib_port_outl(int value, int port)
 {
+#ifdef IO_DRIVERS
   if(__svgalib_nohelper)
   {
     outl(value, port);
@@ -67,10 +76,12 @@ void __svgalib_port_outl(int value, int port)
     iov.port=port;
     ioctl(__svgalib_mem_fd,SVGAHELPER_OUTL,&iov);
   }
+#endif
 }
 
 int __svgalib_port_in(int port)
 {
+#ifdef IO_DRIVERS
   if(__svgalib_nohelper)
   {
     return inb(port);
@@ -84,10 +95,12 @@ int __svgalib_port_in(int port)
 
     return iov.val;
   }
+#endif
 }
 
 int __svgalib_port_inw(int port)
 {
+#ifdef IO_DRIVERS
   if(__svgalib_nohelper)
   {
     return inw(port);
@@ -101,10 +114,12 @@ int __svgalib_port_inw(int port)
 
     return iov.val;
   }
+#endif
 }
 
 int __svgalib_port_inl(int port)
 {
+#ifdef IO_DRIVERS
   if(__svgalib_nohelper)
   {
     return inl(port);
@@ -118,4 +133,5 @@ int __svgalib_port_inl(int port)
 
     return iov.val;
   }
+#endif
 }

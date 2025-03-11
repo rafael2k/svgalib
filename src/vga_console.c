@@ -11,7 +11,11 @@
 #include <sys/kd.h>
 #include <sys/ioctl.h>
 #include <sys/stat.h>
+#if defined(__linux__)
 #include <sys/vt.h>
+#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+#include <sys/consio.h>
+#endif
 #include <sys/wait.h>
 #include <errno.h>
 #include <ctype.h>
@@ -113,10 +117,29 @@ static int check_owner(int vc)
     return 0;
 }
 
+int __svgalib_get_vtactive(int fd)
+{
+    int v;
+#if defined(VT_GETSTATE)
+    struct vt_stat vts;
+
+    if (ioctl(fd, VT_GETSTATE, &vts) == 0)
+        v = vts.v_active;
+    else
+        v = -1;
+#elif defined(VT_GETACTIVE)
+    if (ioctl(fd, VT_GETACTIVE, &v) != 0)
+        v = -1;
+#else
+#error "need porting to this platform"
+#endif
+    return v;
+}
+
 void __svgalib_open_devconsole(void)
 {
     struct vt_mode vtm;
-    struct vt_stat vts;
+    int v_active;
     struct stat sbuf;
     char fname[30];
 
@@ -175,8 +198,8 @@ void __svgalib_open_devconsole(void)
     setsid();
     /* We must use RDWR to allow for output... */
     if (((__svgalib_tty_fd = open(fname, O_RDWR)) >= 0) &&
-        (ioctl(__svgalib_tty_fd, VT_GETSTATE, &vts) >= 0)) {
-        if (!check_owner(vts.v_active)) {
+        (v_active = __svgalib_get_vtactive(__svgalib_tty_fd)) >= 0) {
+        if (!check_owner(v_active)) {
             
             goto error;
         }
@@ -195,8 +218,8 @@ void __svgalib_open_devconsole(void)
         /* clear screen and switch to it */
         fwrite("\e[H\e[J", 6, 1, stderr);
         fflush(stderr);
-        if (__svgalib_vc != vts.v_active) {
-            __svgalib_startup_vc = vts.v_active;
+        if (__svgalib_vc != v_active) {
+            __svgalib_startup_vc = v_active;
 	    ioctl(__svgalib_tty_fd, VT_ACTIVATE, __svgalib_vc);
             __svgalib_waitvtactive();
 	}

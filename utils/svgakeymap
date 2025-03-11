@@ -7,16 +7,16 @@
 #   svgakeymap [physical_map [program_map]] > output.keymap
 #
 # The conversion map is output to stdout; you may wish to redirect it.
-# Keymaps are searched for in /usr/lib/kbd/keytables and are automatically
+# Keymaps are searched for in /usr/share/keymaps and are automatically
 # filtered through gzip if necessary.
 #
 # Read the file README.keymap from the svgalib distribution for more info.
 
-$ktd = "/usr/lib/kbd/keytables/";
+$ktd = "/usr/share/keymaps/";
 if(scalar(@ARGV) > 0) {
     $inmap = $ARGV[0];
 } else {
-    $inmap = "us";
+    $inmap = "i386/qwerty/us";
 }
 if(scalar(@ARGV) > 1) {
     $outmap = $ARGV[1];
@@ -34,7 +34,7 @@ foreach $bob ($inmap, $outmap) {
 
         unless(-e $bob) {
             # Tack a .gz on it
-            $bob .= ".map";
+            $bob .= ".kmap";
             #print "$bob\n";
             
             unless(-e $bob) {

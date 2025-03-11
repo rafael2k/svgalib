@@ -39,7 +39,7 @@ int mouse_init_return_fd(char *dev, int type, int samplerate)
 
     if (!mouse_open) {
 	    if (strcmp(dev, "") == 0)
-		m_dev = "/dev/mouse";
+		m_dev = "/dev/input/mice";
 	    else
 		m_dev = dev;
 	    m_type = type & MOUSE_TYPE_MASK;

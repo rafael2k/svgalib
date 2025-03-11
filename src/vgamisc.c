@@ -112,7 +112,7 @@ int vga_setlinearaddressing(void)
     return __svgalib_linear_mem_size; /* Who cares? */
 }
 
-#if 1
+#if 0
 
 /*
  * The other code doesn't work under Linux/Alpha (I think
@@ -142,18 +142,18 @@ int vga_getkey(void)
 
 int vga_getkey(void)
 {
-    struct termio zap, original;
+    struct termios zap, original;
     int e;
     char c;
 
-    ioctl(fileno(stdin), TCGETA, &original);	/* Get termio */
+    tcgetattr(fileno(stdin), &original);	/* Get termio */
     zap = original;
     zap.c_cc[VMIN] = 0;		/* Modify termio  */
     zap.c_cc[VTIME] = 0;
     zap.c_lflag = 0;
-    ioctl(fileno(stdin), TCSETA, &zap);		/* Set new termio */
+    tcsetattr(fileno(stdin), TCSANOW, &zap);		/* Set new termio */
     e = read(fileno(stdin), &c, 1);	/* Read one char */
-    ioctl(fileno(stdin), TCSETA, &original);	/* Restore termio */
+    tcsetattr(fileno(stdin), TCSANOW, &original);	/* Restore termio */
     if (e != 1)
 	return 0;		/* No key pressed. */
     return c;			/* Return key. */

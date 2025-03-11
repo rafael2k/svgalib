@@ -248,7 +248,7 @@ extern unsigned char *__svgalib_give_graph_blue(void);
  
 #define zero_sa_mask(maskptr) memset(maskptr, 0, sizeof(sigset_t))
 
-#if 1
+#if __GLIBC__ >= 2
 
 #define SVGALIB_ACQUIRE_SIG SIGUSR2
 #define SVGALIB_RELEASE_SIG SIGUSR1

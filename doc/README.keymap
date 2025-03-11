@@ -83,7 +83,7 @@ file is read which lists scancodes produced by the keyboard and their
 equivalents in the layout expected by the program.
 
 A program called svgakeymap is provided to generate these maps from the
-keytable files in /usr/lib/kbd/keytables; you must have perl for it to work.
+keytable files in /usr/share/keymaps; you must have perl for it to work.
 Creating a keymap file with svgakeymap is easy; to make a map to convert
 scancodes from a US Dvorak keyboard to a US QWERTY keyboard as for our example
 above:
