@@ -1,7 +1,7 @@
 /* From VGAlib, changed for svgalib */
 /* partially copyrighted (C) 1993 by Hartmut Schirmer */
 
-
+#include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>		/* for usleep( long ) */
 #include <string.h>
