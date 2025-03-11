@@ -61,7 +61,7 @@ default:
 	@echo "	make clean      - clean every thing. Do this after every change"
 	@echo "	                  of Makefile.cfg!"
 	@echo "	make install	- compile & install components specified in Makefile.cfg"
-	@echo "	make demoprogs	- make demo programs in demo/"
+	@echo "	make demoprogs	- make demo programs in demo/ and threeDKit/"
 	@echo ""
 	@echo "	make uninstall	- remove an existing installation from various"
 	@echo "	                  common places. (old traces often confuse the"
@@ -96,9 +96,10 @@ installsharedlib: $(SHAREDLIBS) $(SVGALIBSHAREDSTUBS)
 	@mkdir -p ${sharedlibdir};
 	@for foo in $(notdir $(SHAREDLIBS)); do \
 		$(INSTALL_SHLIB) sharedlib/$$foo $(sharedlibdir)/$$foo; \
-		cp -d sharedlib/`echo $$foo | sed 's/\.so\..*/.so/'` $(sharedlibdir); \
-		cp -d sharedlib/`echo $$foo | sed 's/\.so\..*/.so/'`.$(MAJOR_VER) $(sharedlibdir); \
+		(cd $(sharedlibdir); \
+		 ln -sf $$foo `echo $$foo | sed 's/\.so\..*/.so/'` ); \
 	done
+	@./fixldsoconf
 	-ldconfig
 
 installstaticlib: static
@@ -179,27 +180,19 @@ installmodule:
 installmodule.alt:
 	(cd kernel/svgalib_helper ; $(MAKE) -f Makefile.alt modules_install )
 
-udev-rules-install:
-	@echo "Installing Udev rules..."
-	@$(INSTALL_DIR) $(rulesdir)
-	@$(INSTALL_DATA) src/udev/56-svga.rules $(rulesdir)
- 
-docs-install:
-	@echo "Installing documentation..."
-	@$(INSTALL_DIR) $(docdir)
-	@$(INSTALL_DATA) 0-README README.md doc/0-INSTALL doc/CHANGES doc/DESIGN \
-	doc/Driver-programming-HOWTO doc/README.joystick doc/README.keymap \
-	doc/README.multi-monitor doc/README.patching doc/README.vesa doc/TODO \
-	doc/add_driver doc/dual-head-howto $(docdir)
-	@$(INSTALL_DATA) lrmi-0.6m/README $(docdir)/README.lrmi
- 
+installdev:
+	(cd kernel/svgalib_helper ; $(MAKE) device )
+
+lib3dkit-install:
+	(cd threeDKit/; $(MAKE) install)
+	 
 install: installheaders $(INSTALLSHAREDLIB) installconfig \
-	$(INSTALLSTATICLIB) $(INSTALLUTILS) $(INSTALLMAN) $(INSTALLMODULE) \
-	docs-install
+	$(INSTALLSTATICLIB) $(INSTALLUTILS) $(INSTALLMAN) $(INSTALLMODULE) $(INSTALLDEV) \
+	lib3dkit-install
 	@echo
 	@echo
 	@echo Now run "'make demoprogs'" to make the test and demo programs in
-	@echo demos/.
+	@echo demos/ and threedkit/.
 
 uninstall:
 	@echo "Removing textmode utilities..."
@@ -239,7 +232,7 @@ STATICDIRS = staticlib/mouse staticlib/keyboard staticlib/ramdac \
 		staticlib/clockchip staticlib/joystick \
 		staticlib/drivers
 UTILDIRS = utils
-DEMODIRS = demos
+DEMODIRS = demos threeDKit
 
 $(SHAREDDIRS0) $(STATICDIRS) $(DEMODIRS):
 	mkdir -p $@
@@ -289,7 +282,6 @@ sharedlib/libvgagl.so.$(VERSION): $(SHAREDDIRS)
 	)
 
 demoprogs: $(PREDEMO) $(DEMODIRS)
-	@$(INSTALL_DIR) $(docdir)/demos
 	@for dir in $(DEMODIRS); do \
 		if [ -d $(SRCDIR)/$$dir ]; then \
 			(cd $$dir; \
@@ -329,6 +321,7 @@ distclean:
 	(cd $(SRCDIR)/gl; $(MAKE) clean)
 	(cd $(SRCDIR)/utils; $(MAKE) clean)
 	(cd $(SRCDIR)/demos; $(MAKE) clean)
+	(cd $(SRCDIR)/threeDKit; $(MAKE) clean)
 	(cd $(SRCDIR)/lrmi-0.6m; $(MAKE) clean)
 	(cd $(SRCDIR)/kernel/svgalib_helper; $(MAKE) clean)
 	rm -f *.orig

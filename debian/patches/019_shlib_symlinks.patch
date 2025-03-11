@@ -1,0 +1,61 @@
+---
+ Makefile     |    4 ++--
+ gl/Makefile  |    5 ++++-
+ src/Makefile |    4 ++++
+ 3 files changed, 10 insertions(+), 3 deletions(-)
+
+--- a/gl/Makefile
++++ b/gl/Makefile
+@@ -30,9 +30,12 @@ MODULES	 = grlib.o driver.o line.o palet
+ all:	libvgagl.a
+ .PHONY: all clean dep
+ 
++libvgagl.so: libvgagl.so.$(VERSION)
+ libvgagl.so.$(VERSION): $(MODULES)
+ 	$(CC) -s -shared -Wl,-soname,libvgagl.so.$(MAJOR_VER) -o libvgagl.so.$(VERSION) \
+ 	  $(MODULES) $(SHLIBLIBS) -L$(srcdir)/sharedlib -lvga
++	ln -sf libvgagl.so.$(VERSION) libvgagl.so
++	ln -sf libvgagl.so.$(VERSION) libvgagl.so.$(MAJOR_VER)
+ 
+ libvgagl.a: $(MODULES)
+ 	rm -f libvgagl.a
+@@ -65,7 +68,7 @@ dep:
+ 	$(CC) $(INCLUDES) -MM $(patsubst %.o,$(srcdir)/gl/%.c,$(MODULES)) >>.depend.gl
+ 
+ clean:
+-	rm -f .depend.gl *.bak *.o *~ libvgagl.a libvgagl.so.$(VERSION)
++	rm -f .depend.gl *.bak *.o *~ libvgagl.a libvgagl.so*
+ 
+ #
+ # include a dependency file if one exists
+--- a/Makefile
++++ b/Makefile
+@@ -96,8 +96,8 @@ installsharedlib: $(SHAREDLIBS) $(SVGALI
+ 	@mkdir -p ${sharedlibdir};
+ 	@for foo in $(notdir $(SHAREDLIBS)); do \
+ 		$(INSTALL_SHLIB) sharedlib/$$foo $(sharedlibdir)/$$foo; \
+-		(cd $(sharedlibdir); \
+-		 ln -sf $$foo `echo $$foo | sed 's/\.so\..*/.so/'` ); \
++		cp -d sharedlib/`echo $$foo | sed 's/\.so\..*/.so/'` $(sharedlibdir); \
++		cp -d sharedlib/`echo $$foo | sed 's/\.so\..*/.so/'`.$(MAJOR_VER) $(sharedlibdir); \
+ 	done
+ 
+ installstaticlib: static
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -450,11 +450,15 @@ libvga.so.$(VERSION): $(ALLOBJS)
+ 	$(CC) -shared -Wl,-soname,libvga.so.$(MAJOR_VER) \
+ 	-Xlinker --retain-symbols-file -Xlinker ../src/exports \
+ 	-Wl,-Bsymbolic -o libvga.so.$(VERSION) $(ALLOBJS) $(SHLIBLIBS) -lm
++	ln -sf libvga.so.$(VERSION) libvga.so
++	ln -sf libvga.so.$(VERSION) libvga.so.$(MAJOR_VER)
+ 
+ $(sharedlibdir)/libvga.so.$(VERSION): libvga.so.$(VERSION)
+ 	$(INSTALL_SHLIB) $< $(sharedlibdir)/$<
+ 
+ install: $(sharedlibdir)/libvga.so.$(VERSION)
++	cp -df sharedlib/libvga.so $(sharedlibdir)/
++	cp -df sharedlib/libvga.so.$(MAJOR_VER) $(sharedlibdir)/
+ 
+ endif	  
+ 

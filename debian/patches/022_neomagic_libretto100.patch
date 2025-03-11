@@ -1,0 +1,17 @@
+Author: Guillem Jover <guillem@debian.org>
+
+---
+ src/config/libvga.config |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/src/config/libvga.config
++++ b/src/config/libvga.config
+@@ -274,7 +274,7 @@ VertRefresh 50 90
+ 
+ # HorizSync 31.5 70
+ # VertRefresh 50 100
+-# Modeline "800x480"   50  800  856  976 1024   480  483  490  504 +hsync +vsy
++# Modeline "800x480"   50  800  856  976 1024   480  483  490  504 +hsync +vsync
+ # newmode  800 480 256       800 1
+ # newmode  800 480 32768    1600 2
+ # newmode  800 480 65536    1600 2

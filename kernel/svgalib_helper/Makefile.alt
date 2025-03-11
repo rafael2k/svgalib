@@ -37,7 +37,7 @@ CFLAGS += $(INCLUDES)
 CFLAGS += -DSVGALIB_HELPER_MAJOR=$(SVGALIB_HELPER_MAJOR)
                                                                                                   
 ifeq (1,$(findstring 1,$(MODVER)))
-	CFLAGS += -DMODVERSIONS -DCONFIG_MODVERSIONS=1
+	CFLAGS += -DMODVERSIONS -include $(INCLUDEDIR)/linux/modversions.h
 endif
 
 TARGET = svgalib_helper
@@ -50,8 +50,7 @@ ifeq (2,$(VER_MAJOR))
 	endif
 endif
 
-modules: $(OBJS)
-all: .depend modules
+all: .depend $(OBJS)
 
 $(TARGET).o: $(SRC:.c=.o)
 	$(LD) -r $^ -o $@
@@ -62,8 +61,8 @@ $(TARGET).ko: $(TARGET).o
 install: device modules_install
 
 modules_install: $(OBJS)
-	mkdir -p $(TOPDIR)/lib/modules/$(VER)/kernel/misc
-	install -m 0644 -c $(OBJS) $(TOPDIR)/lib/modules/$(VER)/kernel/misc
+	mkdir -p /lib/modules/$(VER)/kernel/misc 
+	install -m 0644 -c $(OBJS) /lib/modules/$(VER)/kernel/misc
 
 device:
 	rm -f /dev/svgalib_helper* /dev/svga_helper* /dev/svga /dev/svga?

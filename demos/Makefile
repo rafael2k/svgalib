@@ -13,7 +13,7 @@ VPATH     = $(srcdir)/demos
 # Compiler Section (overrides Makefile.cfg)
 #----------------------------------------------------------------------
 
-CFLAGS = $(WARN) $(OPTIMIZE) -I$(srcdir)/include -I$(srcdir)/gl $(DEBFLAGS) -m32
+CFLAGS = $(WARN) $(OPTIMIZE) -I$(srcdir)/include -I$(srcdir)/gl $(DEBFLAGS)
 ifeq (a.out, $(TARGET_FORMAT))
   CFLAGS += -DSVGA_AOUT
 endif
@@ -28,46 +28,37 @@ PROGS    = fun testgl speedtest mousetest vgatest scrolltest testlinear \
 	   svidtune linearfork cursor vgatweak buildcsr
 
 # Determine what library (static or shared) we will be linking programs with
-#ifdef INSTALLSHAREDLIB
-#  LIBS = -lvgagl -lvga
-#endif
-#ifndef LIBS
+ifdef INSTALLSHAREDLIB
+  LIBS = -lvgagl -lvga
+endif
+ifndef LIBS
   LIBS    = ../staticlib/libvgagl.a ../staticlib/libvga.a -lm
   LVGADEP = $(LIBS)
-#endif
+endif
 
-all:	$(PROGS) graphics
+all:	$(PROGS)
 
 .PHONY: all clean cleanbin dep
 
 $(PROGS): $(LVGADEP)
 
 .c:
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $* $*.c $(LIBS) -L$(srcdir)/sharedlib
-	$(INSTALL_PROGRAM) $* $(docdir)/demos
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $* $*.c $(LIBS)
 
 rwpage: rwpage.pp
-	$(PC) -m32 -Rintel rwpage.pp
+	$(PC) -Rintel rwpage.pp
 
 testaccel: testaccel.c
-	$(CC) $(CFLAGS) $(LDFLAGS) -o testaccel testaccel.c $(LIBS) -lm -L$(srcdir)/sharedlib
-	$(INSTALL_PROGRAM) testaccel $(docdir)/demos
+	$(CC) $(CFLAGS) $(LDFLAGS) -o testaccel testaccel.c $(LIBS) -lm
 
 accel: accel.c
-	$(CC) $(CFLAGS) $(LDFLAGS) -o accel accel.c $(LIBS) -lm -L$(srcdir)/sharedlib
-	$(INSTALL_PROGRAM) accel $(docdir)/demos
+	$(CC) $(CFLAGS) $(LDFLAGS) -o accel accel.c $(LIBS) -lm
 
 linearspeed: linearspeed.c memset.o
-	$(CC) $(CFLAGS) $(LDFLAGS) -o linearspeed linearspeed.c memset.o $(LIBS) -L$(srcdir)/sharedlib
-	$(INSTALL_PROGRAM) linearspeed $(docdir)/demos
+	$(CC) $(CFLAGS) $(LDFLAGS) -o linearspeed linearspeed.c memset.o $(LIBS)
 
 buildcsr: mkcur.o
-	$(CC) -m32 -o buildcsr $(LDFLAGS) mkcur.o -lvgagl -lvga -L$(srcdir)/sharedlib
-	$(INSTALL_PROGRAM) buildcsr $(docdir)/demos
-
-graphics:
-	$(INSTALL_DATA) linuxlogo.bitmap eightbpp.xbm clut.xbm sixbpp.xbm \
-	wizard.xbm wizardmsk.xbm rwpage.pp $(docdir)/demos
+	$(CC) -o buildcsr $(LDFLAGS) mkcur.o -lvgagl -lvga
 
 clean:	cleanbin
 	rm -f .depend *.o *~ *.bak core

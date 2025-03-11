@@ -1,1 +1,0 @@
-http://www.svgalib.org/

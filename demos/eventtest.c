@@ -5,7 +5,6 @@
 #include <unistd.h>
 #include <sys/time.h>
 #include <sys/types.h>
-#include <time.h>
 #include <vga.h>
 #include <vgagl.h>
 #include <vgamouse.h>

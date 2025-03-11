@@ -1,0 +1,17 @@
+001_fhs_transition.patch
+004_build.patch
+010_fPIC.patch
+012_warnings.patch
+013_glibc_ge_2.patch
+016_disable_vgacode.patch
+018_vgagl_against_vga.patch
+019_shlib_symlinks.patch
+021_egadrv_dir.patch
+022_neomagic_libretto100.patch
+026_port_non_ia32.patch
+029_binutils-2.16.patch
+030_manpages_typos.patch
+031_mouse_input.patch
+040_x86emu.patch
+041_use_system_round.patch
+050_port_kfreebsd.patch

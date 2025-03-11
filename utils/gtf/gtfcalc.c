@@ -64,9 +64,7 @@ static GTF_constants GC = {
 
 /*-------------------------- Implementation -------------------------------*/
 
-static double svg_round(double v);
-
-double svg_round(double v)
+static double round(double v)
 {
 	return floor(v + 0.5);
 }
@@ -86,9 +84,9 @@ static void GetInternalConstants(GTF_constants *c)
 ****************************************************************************/
 {
 	c->margin = GC.margin;
-	c->cellGran = svg_round(GC.cellGran);
-	c->minPorch = svg_round(GC.minPorch);
-	c->vSyncRqd = svg_round(GC.vSyncRqd);
+	c->cellGran = round(GC.cellGran);
+	c->minPorch = round(GC.minPorch);
+	c->vSyncRqd = round(GC.vSyncRqd);
 	c->hSync = GC.hSync;
 	c->minVSyncBP = GC.minVSyncBP;
 	if (GC.k == 0)
@@ -142,13 +140,13 @@ void GTF_calcTimings(double hPixels,double vLines,double freq,
 	vFreq = hFreq = dotClock = freq;
 
 	/* Round pixels to character cell granularity */
-	hPixels = svg_round(hPixels / c.cellGran) * c.cellGran;
+	hPixels = round(hPixels / c.cellGran) * c.cellGran;
 
 	/* For interlaced mode halve the vertical parameters, and double
 	 * the required field refresh rate.
 	 */
 	if (wantInterlace) {
-		vLines = svg_round(vLines / 2);
+		vLines = round(vLines / 2);
 		vFieldRate = vFreq * 2;
 		dotClock = dotClock * 2;
 		interlace = 0.5;
@@ -160,8 +158,8 @@ void GTF_calcTimings(double hPixels,double vLines,double freq,
 
 	/* Determine the lines for margins */
 	if (wantMargins) {
-		topMarginLines = svg_round(c.margin / 100 * vLines);
-		botMarginLines = svg_round(c.margin / 100 * vLines);
+		topMarginLines = round(c.margin / 100 * vLines);
+		botMarginLines = round(c.margin / 100 * vLines);
 		}
 	else {
 		topMarginLines = 0;
@@ -175,11 +173,11 @@ void GTF_calcTimings(double hPixels,double vLines,double freq,
 				(vLines + (2*topMarginLines) + c.minPorch + interlace) * 1000000;
 
 			/* Find the number of lines in vSync + back porch */
-			vSyncBP = svg_round(c.minVSyncBP / hPeriodEst);
+			vSyncBP = round(c.minVSyncBP / hPeriodEst);
 			}
 		else if (type == GTF_lockHF) {
 			/* Find the number of lines in vSync + back porch */
-			vSyncBP = svg_round((c.minVSyncBP * hFreq) / 1000);
+			vSyncBP = round((c.minVSyncBP * hFreq) / 1000);
 			}
 
 		/* Find the number of lines in the V back porch alone */
@@ -207,8 +205,8 @@ void GTF_calcTimings(double hPixels,double vLines,double freq,
 
 	/* Find the number of pixels in the left and right margins */
 	if (wantMargins) {
-		leftMarginPixels = svg_round(hPixels * c.margin) / (100 * c.cellGran);
-		rightMarginPixels = svg_round(hPixels * c.margin) / (100 * c.cellGran);
+		leftMarginPixels = round(hPixels * c.margin) / (100 * c.cellGran);
+		rightMarginPixels = round(hPixels * c.margin) / (100 * c.cellGran);
 		}
 	else {
 		leftMarginPixels = 0;
@@ -237,17 +235,17 @@ void GTF_calcTimings(double hPixels,double vLines,double freq,
 		}
 
 	/* Find the number of pixels in blanking time */
-	hBlankPixels = svg_round((hTotalActivePixels * idealDutyCycle) /
+	hBlankPixels = round((hTotalActivePixels * idealDutyCycle) /
 		((100 - idealDutyCycle) * 2 * c.cellGran)) * (2 * c.cellGran);
 
 	/* Find the total number of pixels */
 	hTotalPixels = hTotalActivePixels + hBlankPixels;
 
 	/* Find the horizontal back porch */
-	hBackPorch = svg_round((hBlankPixels / 2) / c.cellGran) * c.cellGran;
+	hBackPorch = round((hBlankPixels / 2) / c.cellGran) * c.cellGran;
 
 	/* Find the horizontal sync width */
-	hSyncWidth = svg_round(((c.hSync/100) * hTotalPixels) / c.cellGran) * c.cellGran;
+	hSyncWidth = round(((c.hSync/100) * hTotalPixels) / c.cellGran) * c.cellGran;
 
 	/* Find the horizontal sync + back porch */
 	hSyncBP = hBackPorch + hSyncWidth;
@@ -260,7 +258,7 @@ void GTF_calcTimings(double hPixels,double vLines,double freq,
 		hPeriod = 1000 / hFreq;
 
 		/* Find the number of lines in vSync + back porch */
-		vSyncBP = svg_round((c.minVSyncBP * hFreq) / 1000);
+		vSyncBP = round((c.minVSyncBP * hFreq) / 1000);
 
 		/* Find the number of lines in the V back porch alone */
 		vBackPorch = vSyncBP - c.vSyncRqd;

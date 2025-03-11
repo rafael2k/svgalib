@@ -1,3 +1,4 @@
-doc/CHANGES
 doc/README.keymap
 doc/README.vesa
+doc/README.multi-monitor
+doc/dual-head-howto

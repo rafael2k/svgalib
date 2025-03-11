@@ -1,3 +1,104 @@
+svgalib (1:1.9.25-3) experimental; urgency=low
+
+  * QA upload.
+  * Merge 1:1.4.3-33 from unstable.
+
+ -- Guillem Jover <guillem@debian.org>  Thu, 12 Apr 2012 06:14:31 +0200
+
+svgalib (1:1.9.25-2) experimental; urgency=low
+
+  * Orphan package, set maintainer to Debian QA Group.
+  * Merge 1:1.4.3-23 to 1:1.4.3-32 from unstable.
+
+ -- Guillem Jover <guillem@debian.org>  Thu, 29 Mar 2012 08:23:15 +0200
+
+svgalib (1:1.9.25-1) experimental; urgency=low
+
+  * New Upstream Release.
+    - debian/patches/004_build.patch: Sync.
+  * Now using Standards-Version 3.7.2 (no changes needed).
+
+ -- Guillem Jover <guillem@debian.org>  Sun,  6 Aug 2006 04:35:55 +0300
+
+svgalib (1:1.9.24-1) experimental; urgency=low
+
+  * New Upstream Release.
+    - debian/patches/004_build.patch: Sync.
+    - debian/patches/010_fPIC.patch: Likewise.
+    - debian/patches/011_close_on_exec.patch: Likewise.
+    - debian/patches/016_disable_vgacode.patch: Likewise.
+    - debian/patches/019_shlib_symlinks.patch: Likewise.
+    - debian/patches/021_egadrv_dir.patch: Likewise.
+  * Use C locale when using bracket expressions. (Closes: #343597)
+    Thanks to Denis Barbier <barbier@debian.org>.
+  * Make textmode look at /etc/vga when run as user, and remove old warning
+    about files directly under /etc. (Closes: #324766)
+    Thanks to Daniel Richard G. <skunk@iskunk.org> for the initial patch.
+  * Do not build LRMI on anything != i386. (Closes: #343888)
+  * Switch to debhelper compat level 5.
+  * Use LSB sysvinit output functions, thus svgalib-bin Depends on lsb-base.
+  * Remove unused commented lines and GZIP setting in debian/rules.
+
+ -- Guillem Jover <guillem@debian.org>  Fri,  6 Jan 2006 23:56:54 +0200
+
+svgalib (1:1.9.23-1) experimental; urgency=low
+
+  * New Upstream Release.
+
+  * debian/patches/:
+    - 002_iopl.patch: Integrated upstream, removed.
+    - 003_fbdev.patch: Likewise.
+    - 005_vesa_storage.patch: Likewise.
+    - 006_invalid_cpp_token.patch: Likewise.
+    - 007_config_typo.patch: Likewise.
+    - 008_mouse_unconfigured.patch: Likewise.
+    - 009_init_ptrs.patch: Likewise.
+    - 014_r128_save_regs.patch: Likewise.
+    - 015_use_FONT_SIZE_const.patch: Likewise.
+    - 017_use_syslog.patch: Likewise.
+    - 020_purge_linux_headers.patch: Likewise.
+    - 021_gl_expandchar_3_bytes_pp.patch: Likewise.
+    - 022_neomagic_libretto100.patch: Likewise.
+    - 023_config_add_chipsets.patch: Likewise.
+    - 024_vesa_not_print_crap.patch: Likewise.
+    - 026_amd64.patch: Likewise.
+    - 025_mmap_return_value_test.patch: Likewise.
+    - 027_mouse_none_no_print.patch: Likewise.
+    - 028_gcc-4.0.patch: Likewise.
+    - 029_binutils-2.16.patch: Likewise.
+
+    - 004_build.patch: Sync with new upstream.
+    - 010_fPIC.patch: Likewise.
+    - 011_open_gt_2.patch: Likewise.
+    - 012_warnings.patch: Likewise.
+    - 013_glibc_ge_2.patch: Likewise.
+    - 016_disable_vgacode.patch: Likewise.
+    - 019_shlib_symlinks.patch: Likewise.
+
+    - 011_open_gt_2.patch: Rename to ...
+    - 011_close_on_exec.patch: ... this.
+
+    - 021_egadrv_dir.patch: New file. Relocate egadrv from drivers subdir.
+
+  * svgalibg1.docs:
+    - Removed CHANGES.mach64.
+    - Added README.multi-monitor and dual-head-howto.
+  * Change watch file URL to the alpha 1.9 branch releases.
+  * Do not use a glob expression in debian/rules now that there are two
+    lrmi versions in the source.
+  * Manpage vga_reset(8) integrated upstream:
+    - debian/vga_reset.8: Remove.
+    - debian/svgalib-bin.manpages: Likewise.
+  * Remove obsolete dummy packages. (Closes: #322068)
+  * Remove obsolete Conflicts, Replaces and Provides.
+  * Update FSF's address.
+  * Do not use bashisms in maintainer scripts:
+    - debian/libsvga1.postrm: Fix.
+    - debian/libsvga1.prerm: Likewise.
+    - debian/svgalib-bin.preinst: Fix by removing the obsolete file.
+
+ -- Guillem Jover <guillem@debian.org>  Fri, 28 Oct 2005 08:28:56 +0300
+
 svgalib (1:1.4.3-33) unstable; urgency=low
 
   * QA upload.
@@ -8,7 +109,6 @@ svgalib (1:1.4.3-33) unstable; urgency=low
 
 svgalib (1:1.4.3-32) unstable; urgency=low
 
-  * Orphan package, set maintainer to Debian QA Group.
   * Use which instead of “command -v” in svgalib-bin.init.
   * Quote `which file` invokation so that “test -x” does not succeed on an
     empty string, causing svgalib-bin.init to fail when the package is

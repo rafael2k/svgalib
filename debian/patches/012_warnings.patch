@@ -1,0 +1,14 @@
+---
+ src/egadrv.c |    1 +
+ 1 file changed, 1 insertion(+)
+
+--- a/src/egadrv.c
++++ b/src/egadrv.c
+@@ -10,6 +10,7 @@
+ 
+ 
+ #include <stdio.h>
++#include <stdlib.h>
+ #include <string.h>
+ #include "vga.h"
+ #include "libvga.h"

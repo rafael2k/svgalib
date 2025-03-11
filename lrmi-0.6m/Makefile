@@ -1,4 +1,4 @@
-CFLAGS ?= -g -Wall -m32
+CFLAGS ?= -g -Wall
 
 sources = lrmi.c
 objects = lrmi.o

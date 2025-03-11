@@ -10,7 +10,7 @@
 # define PCI_GET_CLASS pci_find_class
 # define PCI_GET_DEVICE pci_find_device
 
-# if LINUX_VERSION_CODE >= KERNEL_VERSION(2,5,3)
+# if defined (PG_chainlock)
 #  define my_io_remap_page_range(vma, start, ofs, len, prot) \
 		io_remap_page_range(vma,start,ofs,len,prot)
 # else
@@ -70,7 +70,6 @@ typedef void* devfs_handle_t;
 
 /* These are also not present in 2.6 kernels ... */
 #if (!defined _LINUX_DEVFS_FS_KERNEL_H) || (defined KERNEL_2_6)
-#include <linux/fs.h>
 static inline int devfs_register_chrdev (unsigned int major, const char *name,
                                          struct file_operations *fops)
 {
@@ -78,12 +77,7 @@ static inline int devfs_register_chrdev (unsigned int major, const char *name,
 }
 static inline int devfs_unregister_chrdev (unsigned int major,const char *name)
 {
-#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,0)    
-   return unregister_chrdev (major, name);
-#else
-    unregister_chrdev (major, name);
-    return 0;
-#endif
+    return unregister_chrdev (major, name);
 }
 #endif
 
@@ -105,8 +99,7 @@ static inline int devfs_unregister_chrdev (unsigned int major,const char *name)
      class_device_create(svgalib_helper_class,                      	\
                              MKDEV(SVGALIB_HELPER_MAJOR, _minor),       \
                              &sh_pci_devs[_minor]->dev->dev, _name);
-/* 2.6.15 changed class_device_create */
-#elif LINUX_VERSION_CODE < KERNEL_VERSION(2,6,26)
+#else /* 2.6.15 changed class_device_create */
 #  define SLH_SYSFS_ADD_CONTROL                                         \
      class_device_create(svgalib_helper_class, NULL,                	\
                              MKDEV(SVGALIB_HELPER_MAJOR, 0),            \
@@ -116,42 +109,7 @@ static inline int devfs_unregister_chrdev (unsigned int major,const char *name)
      class_device_create(svgalib_helper_class, NULL,                	\
                              MKDEV(SVGALIB_HELPER_MAJOR, _minor),       \
                              &sh_pci_devs[_minor]->dev->dev, _name);
-/* 2.6.26 changed class_device_create to device_create */
-#elif LINUX_VERSION_CODE < KERNEL_VERSION(2,6,27)
-#  define SLH_SYSFS_ADD_CONTROL                                          \
-     device_create(svgalib_helper_class, NULL,                           \
-                             MKDEV(SVGALIB_HELPER_MAJOR, 0),             \
-                             "svga");
-
-#  define SLH_SYSFS_ADD_DEVICE(_name, _minor)                            \
-     device_create(svgalib_helper_class, &sh_pci_devs[_minor]->dev->dev, \
-                             MKDEV(SVGALIB_HELPER_MAJOR, _minor),        \
-                             _name);
-/* 2.6.27 changed device_create to device_create_drvdata */
-#elif LINUX_VERSION_CODE < KERNEL_VERSION(2,6,28)
-#  define SLH_SYSFS_ADD_CONTROL                                          \
-     device_create_drvdata(svgalib_helper_class, NULL,                   \
-                           MKDEV(SVGALIB_HELPER_MAJOR, 0),               \
-                           "%s%d", "svga", 0);
-
-#  define SLH_SYSFS_ADD_DEVICE(_name, _minor)                            \
-     device_create_drvdata(svgalib_helper_class,                         \
-                           &sh_pci_devs[_minor]->dev->dev,               \
-                           MKDEV(SVGALIB_HELPER_MAJOR, _minor),          \
-                           "%s%d", _name, _minor);
-/* 2.6.28 changed device_create_drvdata back to device_create */
-#else
-#  define SLH_SYSFS_ADD_CONTROL                                         \
-     device_create(svgalib_helper_class, NULL,                          \
-                   MKDEV(SVGALIB_HELPER_MAJOR, 0), NULL,                \
-                   "%s%d", "svga", 0);
-
-#  define SLH_SYSFS_ADD_DEVICE(_name, _minor)                           \
-     device_create(svgalib_helper_class,                                \
-                   &sh_pci_devs[_minor]->dev->dev,                      \
-                   MKDEV(SVGALIB_HELPER_MAJOR, _minor), NULL,           \
-                   "%s%d", _name, _minor);
-#endif
+#endif /* 2.6.15 */
 
 #  define SLH_SYSFS_REMOVE_DEVICE(i)                                    \
      class_destroy(svgalib_helper_class);
@@ -202,8 +160,4 @@ static inline int devfs_unregister_chrdev (unsigned int major,const char *name)
 
 #ifndef PCI_VENDOR_ID_RENDITION 
 #define PCI_VENDOR_ID_RENDITION               0x1163
-#endif
-
-#ifndef IRQF_SHARED
-# define IRQF_SHARED SA_SHIRQ
 #endif

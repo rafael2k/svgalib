@@ -5,8 +5,8 @@
 # running X, and 'textmode' after. This will restore the textmode registers
 # and the VGA palette in addition to the VGA font.
 
-echo Saving font in $HOME/.fontdata
-restorefont -w $HOME/.fontdata
+echo Saving font in /tmp/fontdata
+restorefont -w /tmp/fontdata
 startx
-echo Restoring font from $HOME/.fontdata
-restorefont -r $HOME/.fontdata
+echo Restoring font from /tmp/fontdata
+restorefont -r /tmp/fontdata

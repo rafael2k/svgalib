@@ -112,7 +112,7 @@ int vga_setlinearaddressing(void)
     return __svgalib_linear_mem_size; /* Who cares? */
 }
 
-#if 0
+#if 1
 
 /*
  * The other code doesn't work under Linux/Alpha (I think
