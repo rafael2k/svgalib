@@ -184,6 +184,7 @@ extern int __svgalib_getchipset(void);
 extern int __svgalib_name2number(char *modename);
 extern void __svgalib_delay(void);
 extern int __svgalib_addmode(int xdim, int ydim, int cols, int xbytes, int bytespp);
+extern int __svgalib_get_vtactive(int fd);
 extern void __svgalib_waitvtactive(void);
 extern void __svgalib_open_devconsole(void);
 extern void (*__svgalib_mouse_eventhandler) (int, int, int, int, int, int, int);
