@@ -67,7 +67,7 @@ static GTF_constants GC = {
 /*-------------------------- Implementation -------------------------------*/
 
 #ifndef HAVE_ROUND
-static double round(double v)
+double round(double v)
 {
 	return floor(v + 0.5);
 }
